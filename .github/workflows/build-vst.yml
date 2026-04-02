@@ -32,6 +32,10 @@ jobs:
     - name: Setup Ninja
       uses: seanmiddleditch/gha-setup-ninja@master
 
+    - name: Setup MSVC (Windows native toolkit)
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+
     - name: Configure Compiler Cache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
