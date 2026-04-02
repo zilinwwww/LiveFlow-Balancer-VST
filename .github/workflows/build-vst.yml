@@ -44,6 +44,10 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{env.BUILD_TYPE}}
       
+    - name: Install NSIS (Windows Setup)
+      if: runner.os == 'Windows'
+      run: choco install nsis -y
+      
     - name: Build Installer (Windows)
       if: runner.os == 'Windows'
       working-directory: ${{github.workspace}}/build
