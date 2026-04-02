@@ -8,12 +8,12 @@
 A smart, bi-directional, LUFS-aware dynamic fader riding plugin. Designed to automatically balance backing tracks and vocals for live streaming, podcasting, and post-production.
 
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
-![Version](https://img.shields.io/badge/Version-v1.0.2604a1-green.svg)
+![Version](https://img.shields.io/badge/Version-v1.1.0-green.svg)
 
 ## 📌 Features
+- **Smart Track Profiler (New in v1.1)**: Record a segment of your live performance to auto-generate a custom *Acoustic Profile*. Uses offline FFT collision detection to build multi-band dynamic ducking EQs. Solves the "muffled" sound of traditional full-band duckers by avoiding broadband attenuation.
 - **Smart Gain Riding (Auto-Fader)**: Bi-directional balance control. It continuously maintains the ideal loudness relationship between your vocal and backing track — automatically ducking the backing when it's too loud relative to the vocal, and boosting it when it's too quiet, ensuring both sit perfectly in the mix at all times.
-
-- **Real-Time Visualization**: Features a FabFilter-style rolling gain timeline, providing immediate feedback on tracking hysteresis, voice presence detection, and fader movements.
+- **Real-Time Visualization**: Features a FabFilter-style rolling gain timeline, providing immediate feedback on tracking hysteresis, voice presence detection, and fader movements. Now features a dual-panel layout with dedicated EQ curves for Track Profiles.
 - **Internationalization & Locale Detection**: Complete, zero-dependency English and Simplified Chinese user manual/UI toggling builtin. The plugin features **OS-locale Auto-Sensing**, instantly switching to the native UI based on your operating system region out-of-the-box.
 - **Expert Mode Configuration**: Fine-tune look-ahead latency (up to 50ms), boost ceilings, duck floors, noise gates, and hysteresis release variables to achieve transparent broadcast-ready mixes.
 
@@ -75,8 +75,9 @@ cmake --build build --config Release
 ## 🎛️ Usage Quick Start
 1. Place **LiveFlow Balancer** on your backing track / instrumental channel.
 2. Route your vocal channel into the plugin's **Sidechain Input**.
-3. Adjust the `Target Balance` (e.g., +3dB) to establish the focal relationship between vocal and instrumental.
-4. Set the `Anchor` to `Auto` to let LiveFlow monitor your baseline LUFS, or switch to `Manual` to point it steadily at the thickest part of your vocal dynamically.
+3. *[Optional but Recommended]* Open the **Smart Track Profiler** panel, click "Listen", play the loudest and quietest sections of your backing track whilst singing, and hit "Stop" to automatically generate a custom EQ Profile.
+4. Adjust the `Target Balance` (e.g., +3dB) to establish the focal relationship between vocal and instrumental.
+5. Set the `Anchor` to `Auto` to let LiveFlow monitor your baseline LUFS, or switch to `Manual` to point it steadily at the thickest part of your vocal dynamically.
 
 ## 📖 Architecture & Design
 Refer to the `docs/Design.md` document for deeper architectural insights on multithreading parameters, lock-free queues, and DSP pipeline logic.
@@ -94,12 +95,12 @@ This plugin is licensed under the GPLv3 License, subject to the inherent licensi
 一款智能、双向、感知 LUFS 响度的动态推子调节插件（Fader Riding）。专为直播、播客和后期制作自动平衡伴奏与人声音量而设计。
 
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
-![Version](https://img.shields.io/badge/Version-v1.0.2604a1-green.svg)
+![Version](https://img.shields.io/badge/Version-v1.1.0-green.svg)
 
 ## 📌 核心功能
+- **Smart Track Profiler (v1.1 新增)**：智能音轨分析器。只需点击 Listen 并随意演唱一段包含主副歌的段落，底层即会使用离线 FFT 算法检测人声与伴奏之间的“频谱碰撞”，并据此生成一份专属于这首歌的多段动态 EQ 曲线。有效解决以往“伴奏全频段避让导致声音发闷空洞”的世纪难题。
 - **智能增益调节 (Auto-Fader)**：双向平衡控制。它实时维持人声与伴奏之间的最佳响度关系——当伴奏相对于人声过响时自动压低伴奏，当伴奏相对于人声过弱时自动推高伴奏，确保两者在任何时刻都完美融合。
-
-- **实时可视化**：提供类似 FabFilter 风格的滚动增益时间线，让你可以随时直观地掌控追踪滞后、人声检测阈值以及推子的动态游走状态。
+- **实时可视化**：采用双面板高级流式布局。不仅提供类似 FabFilter 风格的滚动推子时间线（精准展示追踪滞后和触发封包），还包含交互式的频谱避让 EQ 曲线视窗。
 - **国际化与多语言侦测**：内置零依赖的完全纯净的英文/简体中文使用手册与 UI 切换引擎。插件支持**操作系统语言自适应 (OS-locale Auto-Sensing)**，开箱即用，会根据操作系统的地区自动切换到你熟悉的母语界面。
 - **专家模式 (Expert Mode)**：支持深度微调最多 50ms 的预读延迟 (Look-ahead)、推高天花板、避让地板、噪声门阈值以及迟滞释放等参数，助力打造广电级的透明混音作品。
 
@@ -161,8 +162,9 @@ cmake --build build --config Release
 ## 🎛️ 快速上手
 1. 将 **LiveFlow Balancer** 挂载在你的伴奏 / 乐器总轨上。
 2. 把你的人声轨道作为信号发送进入该插件的 **Sidechain (侧链) 输入端**。
-3. 调节 `Target Balance` (例如设置为 +3dB) 来确立人声和你期望的伴奏音量之间的绝对统治力焦点关系。
-4. 将 `Anchor (锚点)` 设为 `Auto (自动)` 让 LiveFlow 自行侦测接管你的底噪 LUFS，或者拨到 `Manual (手动)` 将探测点极其稳固地指向你人声爆发最厚实的地方。
+3. *[可选但极度推荐]* 打开右侧的 **Smart Track Profiler** 选项卡，点击 "Listen (听诊)" 按钮。然后播放你歌曲的最弱段落和最强段落，并跟着唱几秒钟。再次点击停止，它会立刻为你生成这首歌专用的声学避让配方。
+4. 调节 `Target Balance` (例如设置为 +3dB) 来确立人声和你期望的伴奏音量之间的绝对统治力焦点关系。
+5. 将 `Anchor (锚点)` 设为 `Auto (自动)` 让 LiveFlow 自行侦测接管你的底噪 LUFS，或者拨到 `Manual (手动)` 将探测点极其稳固地指向你人声爆发最厚实的地方。
 
 ## 📖 架构设计
 如果有兴趣深究的话，请查阅 `docs/Design.md` 以获取关于多线程无锁队列安全、参数传递以及 DSP 管线逻辑的终极架构视角剖析。

@@ -142,7 +142,10 @@ inline std::vector<HelpSectionDef> getHelpSections (Language lang)
             { ZH("DUCK FLOOR (减益上限) [EXPERT]"), ZH("向下压暗的深坑底线！不管给伴奏多少让步，都不会低于这个限制。通常代表允许伴奏随时大幅避让的极限。") },
             { ZH("NOISE GATE (噪声门) [EXPERT]"), ZH("防止环境底噪、呼吸声触发伴奏避让的绝对下限。") },
             { ZH("LOOK AHEAD (预判) [EXPERT]"), ZH("提前感知人声峰值避开爆破元音。适用于录音室。直播环境建议关掉以避免引入延迟。") },
-            { ZH("RELEASE HYST (脱扣延迟) [EXPERT]"), ZH("防止歌手在每个词之间几百毫秒的空隙导致伴奏猛弹回来。它会让避让状态保持得更加坚决。") }
+            { ZH("RELEASE HYST (脱扣延迟) [EXPERT]"), ZH("防止歌手在每个词之间几百毫秒的空隙导致伴奏猛弹回来。它会让避让状态保持得更加坚决。") },
+            { ZH("SMART TRACK PROFILER (智能音轨分析) [v1.1]"), ZH("录制一段实时的演出，自动计算伴奏和人声的频谱碰撞并生成最优的多段动态 EQ 曲线。避免了全频段避让带来的沉闷感。") },
+            { ZH("LISTEN (智能听诊) [PROFILER]"), ZH("点击开始录音采样。同时播放伴奏并演唱，Profiler 会在后台分析不同音量下的频谱碰撞点。再次点击停止并生成配方。") },
+            { ZH("ZONES & BANDS (区间与段数) [PROFILER]"), ZH("Zones 决定算法根据伴奏响度分几个能量区间（静音/主歌/副歌），Bands 决定每个区间能最多避让几个频段。") }
         };
     }
     else
@@ -157,7 +160,10 @@ inline std::vector<HelpSectionDef> getHelpSections (Language lang)
             { "DUCK FLOOR [EXPERT]", "Absolute threshold for pushing the backing track down. Prevents the backing from dying completely during extreme shouting." },
             { "NOISE GATE [EXPERT]", "Vocal detection cutoff threshold. Prevents ambient room noise and mic bleed from triggering fader actions." },
             { "LOOK AHEAD [EXPERT]", "Pre-computes fader movements to catch transients perfectly. Great for post-production but adds latency in live streaming. Set to 0ms for live." },
-            { "RELEASE HYST [EXPERT]", "Hysteresis prevents pumping by holding the ducked state explicitly over tiny gaps (like breathing) between words." }
+            { "RELEASE HYST [EXPERT]", "Hysteresis prevents pumping by holding the ducked state explicitly over tiny gaps (like breathing) between words." },
+            { "SMART TRACK PROFILER [v1.1]", "Record a live performance segment to automatically compute spectral collisions and generate an optimal multi-band dynamic EQ curve. Avoids the muffled sound of full-band ducking." },
+            { "LISTEN [PROFILER]", "Click to start recording. Play the backing track and sing at the same time. The profiler analyzes collisions across different volume levels. Click again to generate a Profile." },
+            { "ZONES & BANDS [PROFILER]", "Zones: How many energy levels (quiet/verse/chorus) the algorithm uses. Bands: Maximum number of frequency notches per zone." }
         };
     }
 }
