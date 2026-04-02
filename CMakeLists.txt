@@ -203,6 +203,7 @@ if (WIN32)
     set(CPACK_NSIS_HELP_LINK "mailto:zilinww@gmail.com")
     set(CPACK_NSIS_CONTACT "zilinww@gmail.com")
     set(CPACK_NSIS_MODIFY_PATH OFF)
+    set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
     
     # 强制将 NSIS 自动安装包界面的系统语言强硬锁定为简体中文
     set(CPACK_NSIS_LANGUAGE "SimpChinese")
