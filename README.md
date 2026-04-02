@@ -1,10 +1,9 @@
 # LiveFlow Balancer
 
-[English](#english) | [简体中文](#简体中文)
+<details open>
+<summary><strong>🇺🇸 English (Click to collapse/expand)</strong></summary>
 
----
-
-<h2 id="english">English</h2>
+<br>
 
 A smart, bi-directional, LUFS-aware dynamic fader riding plugin. Designed to automatically balance backing tracks and vocals for live streaming, podcasting, and post-production.
 
@@ -85,9 +84,12 @@ Refer to the `docs/Design.md` document for deeper architectural insights on mult
 ## 📜 License
 This plugin is licensed under the GPLv3 License, subject to the inherent licensing obligations carried by the JUCE framework in open-source utilization. Please check [JUCE Licensing](https://juce.com/) for commercial deployment policies.
 
----
+</details>
 
-<h2 id="简体中文">简体中文</h2>
+<details>
+<summary><strong>🇨🇳 简体中文 (点击展开/折叠)</strong></summary>
+
+<br>
 
 一款智能、双向、感知 LUFS 响度的动态推子调节插件（Fader Riding）。专为直播、播客和后期制作自动平衡伴奏与人声音量而设计。
 
@@ -167,3 +169,5 @@ cmake --build build --config Release
 
 ## 📜 开源协议 / 授权
 本项目基于 GPLv3 协议开源发布。遵循 JUCE 框架在开源使用情形下的内在附带许可义务准则。如果你需要将本架构用于商业发行目的，请查阅 [JUCE 商业授权条例](https://juce.com/)。
+
+</details>
