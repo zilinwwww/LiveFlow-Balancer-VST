@@ -12,7 +12,7 @@ A smart, bi-directional, LUFS-aware dynamic fader riding plugin. Designed to aut
 
 ## 📌 Features
 - **Smart Gain Riding (Auto-Fader)**: Bi-directional control. It lifts the backing track when the vocal is too quiet, and smoothly pushes the backing track down when the vocal hits hard.
-- **Spectral Sidechain Ducking**: Preserves low-end punch (kick drums/bass) and high-end air (cymbals) when ducking, avoiding the "muddy" volume pumping artifacts associated with standard broadband sidechain compressors.
+
 - **Real-Time Visualization**: Features a FabFilter-style rolling gain timeline, providing immediate feedback on tracking hysteresis, voice presence detection, and fader movements.
 - **Internationalization & Locale Detection**: Complete, zero-dependency English and Simplified Chinese user manual/UI toggling builtin. The plugin features **OS-locale Auto-Sensing**, instantly switching to the native UI based on your operating system region out-of-the-box.
 - **Expert Mode Configuration**: Fine-tune look-ahead latency (up to 50ms), boost ceilings, duck floors, noise gates, and hysteresis release variables to achieve transparent broadcast-ready mixes.
@@ -98,7 +98,7 @@ This plugin is licensed under the GPLv3 License, subject to the inherent licensi
 
 ## 📌 核心功能
 - **智能增益调节 (Auto-Fader)**：双向控制。当人声太小，它会自动提升伴奏音量进行托底；当人声爆发时，又会平滑地将伴奏避让压低。
-- **频段侧链避让 (Spectral Ducking)**：在人声切入避让时，智能保留底鼓、贝斯等低频的冲击力以及镲片等高频的空气感，完美避免了传统宽频侧链压缩器带来的“音量泵吸 (Pumping)”和“混浊”的副作用。
+
 - **实时可视化**：提供类似 FabFilter 风格的滚动增益时间线，让你可以随时直观地掌控追踪滞后、人声检测阈值以及推子的动态游走状态。
 - **国际化与多语言侦测**：内置零依赖的完全纯净的英文/简体中文使用手册与 UI 切换引擎。插件支持**操作系统语言自适应 (OS-locale Auto-Sensing)**，开箱即用，会根据操作系统的地区自动切换到你熟悉的母语界面。
 - **专家模式 (Expert Mode)**：支持深度微调最多 50ms 的预读延迟 (Look-ahead)、推高天花板、避让地板、噪声门阈值以及迟滞释放等参数，助力打造广电级的透明混音作品。
