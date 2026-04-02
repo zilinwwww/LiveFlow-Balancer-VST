@@ -3,6 +3,8 @@ name: Build VST
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ "main" ]
 
@@ -58,3 +60,36 @@ jobs:
           ${{github.workspace}}/build/**/*_artefacts/**/*.vst3
           ${{github.workspace}}/build/**/*_artefacts/**/*.component
         if-no-files-found: warn
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: drop
+
+      - name: Prepare Release Assets
+        run: |
+          mkdir release_assets
+          # Extract the Windows Exe installer standalone
+          find drop/LiveFlow-Balancer-Installer-Windows -type f -name "*.exe" -exec mv {} release_assets/ \; || true
+          
+          # Compress macOS and Linux raw plugin bundles (.vst3 / .component are directories on Mac)
+          cd drop
+          for bundle in LiveFlow-Balancer-VST3-*/; do
+            if [ -d "$bundle" ]; then
+              bundle_name=$(basename "$bundle")
+              zip -r "../release_assets/${bundle_name}.zip" "$bundle"
+            fi
+          done
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release_assets/*
+          generate_release_notes: true
