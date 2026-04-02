@@ -128,11 +128,9 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
     aboutButton.setButtonText ("About");
     aboutButton.onClick = [this]
     {
-        const auto lang = isChinese ? i18n::Language::Chinese : i18n::Language::English;
-        juce::AlertWindow::showMessageBoxAsync (
-            juce::AlertWindow::InfoIcon,
-            i18n::getText ("About_Title", lang),
-            i18n::getText ("About_Desc", lang) + "\n\nVersion: " + juce::String(LIVEFLOW_VERSION_EXT));
+        aboutOverlay.setBounds (getLocalBounds());
+        aboutOverlay.toFront (true);
+        aboutOverlay.setVisible (true);
     };
 
     addAndMakeVisible (langButton);
@@ -171,6 +169,10 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
     addChildComponent (helpOverlay);
     helpOverlay.setVisible (false);
     helpOverlay.onClose = [this] { helpOverlay.setVisible (false); };
+
+    addChildComponent (aboutOverlay);
+    aboutOverlay.setVisible (false);
+    aboutOverlay.onClose = [this] { aboutOverlay.setVisible (false); };
 
     updateAllTexts();
 
@@ -317,6 +319,7 @@ void LiveFlowAudioProcessorEditor::resized()
     expertSection.setVisible (expertVisible);
 
     helpOverlay.setBounds (getLocalBounds());
+    aboutOverlay.setBounds (getLocalBounds());
 }
 
 void LiveFlowAudioProcessorEditor::updateAllTexts()
@@ -344,6 +347,7 @@ void LiveFlowAudioProcessorEditor::updateAllTexts()
     presenceReleaseKnob.setLabel (i18n::getText ("Label_ReleaseHyst", lang));
     
     helpOverlay.updateLanguage (isChinese);
+    aboutOverlay.updateLanguage (isChinese);
     repaint();
 }
 

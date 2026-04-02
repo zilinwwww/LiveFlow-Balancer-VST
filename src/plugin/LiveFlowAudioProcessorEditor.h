@@ -6,6 +6,7 @@
 
 #include "ui/CompactKnob.h"
 #include "ui/GainTimelineComponent.h"
+#include "ui/AboutOverlay.h"
 #include "ui/HelpOverlay.h"
 #include "ui/LiveFlowLookAndFeel.h"
 #include "ui/PresenceIndicator.h"
@@ -109,6 +110,7 @@ private:
     
     // Overlays must be last to render top-most!
     HelpOverlay helpOverlay;
+    AboutOverlay aboutOverlay;
     
     bool isChinese = juce::SystemStats::getUserLanguage().startsWithIgnoreCase("zh");
     void updateAllTexts();

@@ -4,9 +4,9 @@ if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Build macOS Universal Binaries")
 endif()
 
-project(LiveFlowBalancer VERSION 1.0.2604 LANGUAGES C CXX)
+project(LiveFlowBalancer VERSION 1.0.0 LANGUAGES C CXX)
 
-set(LIVEFLOW_VERSION_SUFFIX "-alpha-2")
+set(LIVEFLOW_VERSION_SUFFIX "-20260403-beta-1")
 set(LIVEFLOW_VERSION_STRING "v${PROJECT_VERSION}${LIVEFLOW_VERSION_SUFFIX}")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -148,6 +148,8 @@ target_sources(LiveFlowBalancer
         src/ui/PresenceIndicator.h
         src/ui/HelpOverlay.cpp
         src/ui/HelpOverlay.h
+        src/ui/AboutOverlay.cpp
+        src/ui/AboutOverlay.h
         src/ui/Translations.h
         src/ui/VisualizerComponent.cpp
         src/ui/VisualizerComponent.h)
