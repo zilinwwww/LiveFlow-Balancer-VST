@@ -66,7 +66,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: LiveFlow-Balancer-Installer-Windows
-        path: ${{github.workspace}}/build/*.exe
+        path: |
+          ${{github.workspace}}/build/*.exe
+          !${{github.workspace}}/build/*_helper.exe
         if-no-files-found: warn
         
     - name: Upload VST3 Plugin
