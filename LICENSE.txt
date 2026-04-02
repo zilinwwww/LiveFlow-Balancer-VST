@@ -1,0 +1,10 @@
+LiveFlow Balancer End-User License Agreement (EULA)
+
+1. GNU General Public License v3.0 (GPLv3)
+This software is provided "AS-IS", without any express or implied warranty. Under the GNU General Public License version 3, you are free to modify and redistribute this software as long as the source code remains open and freely accessible. In no event will the authors be held liable for any damages arising from the use of this software.
+
+2. Usage
+You may use this software strictly in VST3 compatible hosts. It intelligently processes audio by dynamically reading sidechain signals.
+
+3. Distribution
+This software is free and open source. Commercial redistribution without permission is strictly prohibited under the current JUCE framework licensing bounds unless you obtain an indepedent JUCE 8 commercial string.

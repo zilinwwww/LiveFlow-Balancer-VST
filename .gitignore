@@ -1,0 +1,7 @@
+build/
+build-win/
+cmake-build-*/
+.vs/
+*.vcxproj.user
+*.suo
+*.user
