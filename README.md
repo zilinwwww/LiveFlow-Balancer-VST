@@ -1,4 +1,7 @@
 # LiveFlow Balancer
+
+[English](README.md) | [中文](README_zh.md)
+
 A smart, bi-directional, LUFS-aware dynamic fader riding plugin. Designed to automatically balance backing tracks and vocals for live streaming, podcasting, and post-production.
 
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
