@@ -4,8 +4,9 @@
 
 namespace
 {
-constexpr int defaultEditorWidth = 880;
-constexpr int defaultEditorHeight = 600;
+constexpr int defaultEditorWidth = 1260;
+constexpr int defaultEditorHeight = 620;
+constexpr int profilerPanelWidth = 340;
 
 juce::Colour coreAccent (const int index)
 {
@@ -28,6 +29,17 @@ juce::Colour expertAccent (const int index)
         juce::Colour (0xff7fd8e6), // Noise Gate — teal
         juce::Colour (0xfff7d57a), // Look-ahead — gold
         juce::Colour (0xff9ce8c8)  // Presence Release — mint
+    };
+
+    return colours[static_cast<size_t> (index % static_cast<int> (colours.size()))];
+}
+
+juce::Colour profilerAccent (const int index)
+{
+    static const std::array colours {
+        juce::Colour (0xffff6b9d), // Max Record — pink
+        juce::Colour (0xffb088f9), // Zones — purple
+        juce::Colour (0xff6dd5fa)  // Bands — sky blue
     };
 
     return colours[static_cast<size_t> (index % static_cast<int> (colours.size()))];
@@ -60,12 +72,18 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
       lookAheadKnob ("Look-ahead", expertAccent (3),
                       [] (double v) { return formatMilliseconds (v); }),
       presenceReleaseKnob ("Pres. Rel.", expertAccent (4),
-                            [] (double v) { return formatMilliseconds (v); })
+                            [] (double v) { return formatMilliseconds (v); }),
+      maxRecordKnob ("Max Record", profilerAccent (0),
+                      [] (double v) { return juce::String (static_cast<int> (v)) + " min"; }),
+      numZonesKnob ("Zones", profilerAccent (1),
+                     [] (double v) { return juce::String (static_cast<int> (v)); }),
+      numBandsKnob ("EQ Bands", profilerAccent (2),
+                     [] (double v) { return juce::String (static_cast<int> (v)); })
 {
     setLookAndFeel (&lookAndFeel);
     setOpaque (true);
     setResizable (true, true);
-    setResizeLimits (760, 520, 1200, 800);
+    setResizeLimits (1060, 540, 1600, 900);
     setSize (defaultEditorWidth, defaultEditorHeight);
 
     // Main components
@@ -172,10 +190,109 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
     helpOverlay.setVisible (false);
     helpOverlay.onClose = [this] { helpOverlay.setVisible (false); };
 
+    // ── Smart Track Profiler Panel ──
+    // Listen button (red record style)
+    listenButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0x28ff6b9d));
+    listenButton.setColour (juce::TextButton::textColourOffId, juce::Colour (0xffff6b9d));
+    listenButton.onClick = [this]
+    {
+        auto& prof = processor.getProfiler();
+        const auto state = prof.getState();
+
+        if (state == ProfilerState::Idle || state == ProfilerState::Done)
+        {
+            processor.startProfiling();
+        }
+        else if (state == ProfilerState::Recording)
+        {
+            // Generate a default name
+            const auto name = "Profile " + juce::String (static_cast<int> (processor.getProfiles().size()) + 1);
+            processor.stopProfiling (name);
+        }
+    };
+    addAndMakeVisible (listenButton);
+
+    // Profile selector
+    profileSelector.setColour (juce::ComboBox::backgroundColourId, juce::Colour (0xff14202e));
+    profileSelector.setColour (juce::ComboBox::textColourId, juce::Colour (0xffeef4fb));
+    profileSelector.setColour (juce::ComboBox::outlineColourId, juce::Colour (0x30ffffff));
+    profileSelector.onChange = [this]
+    {
+        const auto selected = profileSelector.getSelectedId();
+        processor.setActiveProfileIndex (selected - 1);
+    };
+    addAndMakeVisible (profileSelector);
+    updateProfileSelector();
+
+    // Export / Import / Delete buttons
+    for (auto* btn : { &exportButton, &importButton, &deleteButton })
+    {
+        btn->setColour (juce::TextButton::buttonColourId, juce::Colour (0x10ffffff));
+        btn->setColour (juce::TextButton::textColourOffId, juce::Colour (0xff9fb0c7));
+        addAndMakeVisible (*btn);
+    }
+
+    exportButton.onClick = [this]
+    {
+        const auto idx = processor.getActiveProfileIndex();
+        if (idx < 0) return;
+
+        auto chooser = std::make_shared<juce::FileChooser> ("Export Profile", juce::File {}, "*.json");
+        chooser->launchAsync (juce::FileBrowserComponent::saveMode, [this, idx, chooser] (const juce::FileChooser& fc)
+        {
+            if (auto result = fc.getResult(); result != juce::File {})
+                processor.exportProfileToJSON (idx, result.withFileExtension ("json"));
+        });
+    };
+
+    importButton.onClick = [this]
+    {
+        auto chooser = std::make_shared<juce::FileChooser> ("Import Profile", juce::File {}, "*.json");
+        chooser->launchAsync (juce::FileBrowserComponent::openMode, [this, chooser] (const juce::FileChooser& fc)
+        {
+            if (auto result = fc.getResult(); result.existsAsFile())
+            {
+                processor.importProfileFromJSON (result);
+                updateProfileSelector();
+            }
+        });
+    };
+
+    deleteButton.onClick = [this]
+    {
+        const auto idx = processor.getActiveProfileIndex();
+        if (idx >= 0)
+        {
+            processor.deleteProfile (idx);
+            updateProfileSelector();
+        }
+    };
+
+    // Status & recording time labels
+    profilerStatusLabel.setColour (juce::Label::textColourId, juce::Colour (0xff9fb0c7));
+    profilerStatusLabel.setFont (juce::FontOptions (11.0f));
+    addAndMakeVisible (profilerStatusLabel);
+
+    recordingTimeLabel.setColour (juce::Label::textColourId, juce::Colour (0xffff6b9d));
+    recordingTimeLabel.setFont (juce::FontOptions (12.0f, juce::Font::bold));
+    addAndMakeVisible (recordingTimeLabel);
+
+    // Profiler settings knobs
+    maxRecordKnob.setLabel ("Max Record");
+    numZonesKnob.setLabel ("Zones");
+    numBandsKnob.setLabel ("EQ Bands");
+    addAndMakeVisible (maxRecordKnob);
+    addAndMakeVisible (numZonesKnob);
+    addAndMakeVisible (numBandsKnob);
+
+    maxRecordAttachment = attachSlider (param::profileMaxMinutes, maxRecordKnob.getSlider());
+    numZonesAttachment = attachSlider (param::profileNumZones, numZonesKnob.getSlider());
+    numBandsAttachment = attachSlider (param::profileNumBands, numBandsKnob.getSlider());
+
     updateAllTexts();
 
     startTimerHz (30);
-    setSize (880, 600);
+    setSize (defaultEditorWidth, defaultEditorHeight);
 }
 
 LiveFlowAudioProcessorEditor::~LiveFlowAudioProcessorEditor()
@@ -191,6 +308,21 @@ void LiveFlowAudioProcessorEditor::timerCallback()
     presenceIndicator.setPresence (snap.voicePresence);
     gainTimeline.repaint();
     presenceIndicator.repaint();
+
+    // Update profiler UI
+    updateProfilerUI();
+
+    // Auto-pick up newly generated profiles
+    const auto& prof = processor.getProfiler();
+    if (prof.getState() == ProfilerState::Done)
+    {
+        // Transfer profile from profiler to processor's list
+        auto& profiles = const_cast<std::vector<TrackProfile>&> (processor.getProfiles());
+        profiles.push_back (prof.getGeneratedProfile());
+        const_cast<TrackProfiler&> (prof).acknowledgeProfile();
+        processor.setActiveProfileIndex (static_cast<int> (profiles.size()) - 1);
+        updateProfileSelector();
+    }
 }
 
 void LiveFlowAudioProcessorEditor::paint (juce::Graphics& graphics)
@@ -226,11 +358,54 @@ void LiveFlowAudioProcessorEditor::paint (juce::Graphics& graphics)
     graphics.setFont (juce::FontOptions (9.5f));
     const auto lang = isChinese ? i18n::Language::Chinese : i18n::Language::English;
     graphics.drawText (i18n::getText ("Header_Sub", lang), titleArea, juce::Justification::centredLeft);
+
+    // ── Profiler Panel Background ──
+    if (profilerPanelVisible)
+    {
+        auto panelBounds = getLocalBounds();
+        panelBounds.removeFromLeft (panelBounds.getWidth() - profilerPanelWidth);
+
+        // Panel background
+        graphics.setColour (juce::Colour (0xff0d1825));
+        graphics.fillRect (panelBounds.toFloat());
+
+        // Left edge separator
+        graphics.setColour (juce::Colour (0x20ffffff));
+        graphics.drawVerticalLine (panelBounds.getX(), 0.0f, static_cast<float> (panelBounds.getHeight()));
+
+        // Panel title
+        auto panelTitle = panelBounds.reduced (16, 0).removeFromTop (40);
+        graphics.setColour (juce::Colour (0xffff6b9d));
+        graphics.setFont (juce::FontOptions (13.0f, juce::Font::bold));
+        graphics.drawText (i18n::getText ("Panel_Profiler", lang),
+                           panelTitle, juce::Justification::centredLeft);
+
+        // Record progress bar background
+        const auto& prof = processor.getProfiler();
+        if (prof.getState() == ProfilerState::Recording)
+        {
+            auto progressArea = panelBounds.reduced (16, 0);
+            progressArea.removeFromTop (110);
+            auto barBounds = progressArea.removeFromTop (6).toFloat();
+
+            // Background
+            graphics.setColour (juce::Colour (0x20ffffff));
+            graphics.fillRoundedRectangle (barBounds, 3.0f);
+
+            // Fill
+            auto fillBounds = barBounds.withWidth (barBounds.getWidth() * prof.getProgress());
+            graphics.setColour (juce::Colour (0xffff6b9d));
+            graphics.fillRoundedRectangle (fillBounds, 3.0f);
+        }
+    }
 }
 
 void LiveFlowAudioProcessorEditor::resized()
 {
-    auto bounds = getLocalBounds().reduced (14);
+    const auto leftPanelWidth = profilerPanelVisible
+                                    ? getWidth() - profilerPanelWidth
+                                    : getWidth();
+    auto bounds = getLocalBounds().withWidth (leftPanelWidth).reduced (14);
     auto titleArea = bounds.removeFromTop (32); // Title bar
     
     // Position header buttons
@@ -316,6 +491,53 @@ void LiveFlowAudioProcessorEditor::resized()
 
     expertSection.setVisible (expertVisible);
 
+    // ── Smart Track Profiler Right Panel ──
+    if (profilerPanelVisible)
+    {
+        auto panelBounds = getLocalBounds();
+        panelBounds.removeFromLeft (panelBounds.getWidth() - profilerPanelWidth);
+        panelBounds = panelBounds.reduced (16, 0);
+        panelBounds.removeFromTop (44); // Panel title space
+
+        // Listen button
+        listenButton.setBounds (panelBounds.removeFromTop (36));
+        panelBounds.removeFromTop (8);
+
+        // Recording time label
+        recordingTimeLabel.setBounds (panelBounds.removeFromTop (18));
+        panelBounds.removeFromTop (2);
+
+        // Progress bar space (painted in paint())
+        panelBounds.removeFromTop (8);
+
+        // Status label
+        profilerStatusLabel.setBounds (panelBounds.removeFromTop (16));
+        panelBounds.removeFromTop (12);
+
+        // Profile selector
+        profileSelector.setBounds (panelBounds.removeFromTop (28));
+        panelBounds.removeFromTop (8);
+
+        // Export / Import / Delete row
+        auto btnRow = panelBounds.removeFromTop (26);
+        const auto mgmtBtnW = (btnRow.getWidth() - 8) / 3;
+        exportButton.setBounds (btnRow.removeFromLeft (mgmtBtnW));
+        btnRow.removeFromLeft (4);
+        importButton.setBounds (btnRow.removeFromLeft (mgmtBtnW));
+        btnRow.removeFromLeft (4);
+        deleteButton.setBounds (btnRow);
+        panelBounds.removeFromTop (16);
+
+        // Profiler settings knobs
+        auto settingsRow = panelBounds.removeFromTop (72);
+        const auto settingsKnobW = (settingsRow.getWidth() - 8) / 3;
+        maxRecordKnob.setBounds (settingsRow.removeFromLeft (settingsKnobW));
+        settingsRow.removeFromLeft (4);
+        numZonesKnob.setBounds (settingsRow.removeFromLeft (settingsKnobW));
+        settingsRow.removeFromLeft (4);
+        numBandsKnob.setBounds (settingsRow);
+    }
+
     helpOverlay.setBounds (getLocalBounds());
 }
 
@@ -344,6 +566,16 @@ void LiveFlowAudioProcessorEditor::updateAllTexts()
     presenceReleaseKnob.setLabel (i18n::getText ("Label_ReleaseHyst", lang));
     
     helpOverlay.updateLanguage (isChinese);
+
+    // Profiler panel texts
+    maxRecordKnob.setLabel (i18n::getText ("Label_MaxRecord", lang));
+    numZonesKnob.setLabel (i18n::getText ("Label_NumZones", lang));
+    numBandsKnob.setLabel (i18n::getText ("Label_NumBands", lang));
+    exportButton.setButtonText (i18n::getText ("Btn_Export", lang));
+    importButton.setButtonText (i18n::getText ("Btn_Import", lang));
+    deleteButton.setButtonText (i18n::getText ("Btn_Delete", lang));
+
+    updateProfilerUI();
     repaint();
 }
 
@@ -377,4 +609,88 @@ LiveFlowAudioProcessorEditor::attachSlider (const juce::String& parameterId, juc
 {
     return std::make_unique<SliderAttachment> (processor.getValueTreeState(), parameterId, slider);
 }
+
+// ═══════════════════════════════════════════
+// Profiler Helpers
+// ═══════════════════════════════════════════
+
+void LiveFlowAudioProcessorEditor::updateProfileSelector()
+{
+    profileSelector.clear (juce::dontSendNotification);
+    const auto lang = isChinese ? i18n::Language::Chinese : i18n::Language::English;
+
+    profileSelector.addItem (i18n::getText ("Profile_None", lang), 1);
+
+    const auto& profiles = processor.getProfiles();
+
+    for (int i = 0; i < static_cast<int> (profiles.size()); ++i)
+        profileSelector.addItem (profiles[static_cast<size_t> (i)].name, i + 2);
+
+    const auto activeIdx = processor.getActiveProfileIndex();
+    profileSelector.setSelectedId (activeIdx >= 0 ? activeIdx + 2 : 1, juce::dontSendNotification);
+}
+
+void LiveFlowAudioProcessorEditor::updateProfilerUI()
+{
+    const auto lang = isChinese ? i18n::Language::Chinese : i18n::Language::English;
+    const auto& prof = processor.getProfiler();
+    const auto state = prof.getState();
+
+    // Update Listen button text and color
+    switch (state)
+    {
+        case ProfilerState::Recording:
+        {
+            listenButton.setButtonText (i18n::getText ("Btn_StopListen", lang));
+            listenButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0x40ff3333));
+            listenButton.setColour (juce::TextButton::textColourOffId, juce::Colour (0xffff4444));
+
+            // Update recording time display
+            const auto secs = static_cast<int> (prof.getRecordedSeconds());
+            const auto maxSecs = static_cast<int> (prof.getMaxSeconds());
+            recordingTimeLabel.setText (
+                juce::String::formatted ("%d:%02d / %d:%02d",
+                                        secs / 60, secs % 60,
+                                        maxSecs / 60, maxSecs % 60),
+                juce::dontSendNotification);
+            break;
+        }
+        case ProfilerState::Analyzing:
+        {
+            listenButton.setButtonText (i18n::getText ("Profile_Analyzing", lang));
+            listenButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0x28f7d57a));
+            listenButton.setColour (juce::TextButton::textColourOffId, juce::Colour (0xfff7d57a));
+            recordingTimeLabel.setText ("", juce::dontSendNotification);
+            break;
+        }
+        default:
+        {
+            listenButton.setButtonText (i18n::getText ("Btn_Listen", lang));
+            listenButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0x28ff6b9d));
+            listenButton.setColour (juce::TextButton::textColourOffId, juce::Colour (0xffff6b9d));
+            recordingTimeLabel.setText ("", juce::dontSendNotification);
+            break;
+        }
+    }
+
+    // Status text
+    juce::String statusText;
+    const auto activeIdx = processor.getActiveProfileIndex();
+
+    if (state == ProfilerState::Recording)
+        statusText = i18n::getText ("Profile_Recording", lang);
+    else if (state == ProfilerState::Analyzing)
+        statusText = i18n::getText ("Profile_Analyzing", lang);
+    else if (state == ProfilerState::Error)
+        statusText = i18n::getText ("Profile_Error", lang);
+    else if (activeIdx >= 0)
+        statusText = i18n::getText ("Profile_Ready", lang);
+
+    profilerStatusLabel.setText (statusText, juce::dontSendNotification);
+
+    // Trigger repaint for progress bar
+    if (state == ProfilerState::Recording)
+        repaint();
+}
+
 } // namespace liveflow

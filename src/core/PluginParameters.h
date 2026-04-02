@@ -21,6 +21,12 @@ inline constexpr auto duckFloor = "duckFloor";
 inline constexpr auto noiseGate = "noiseGate";
 inline constexpr auto lookAhead = "lookAhead";
 inline constexpr auto presenceRelease = "presenceRelease";
+
+// Smart Track Profiler parameters
+inline constexpr auto profileActive = "profileActive";
+inline constexpr auto profileMaxMinutes = "profileMaxMinutes";
+inline constexpr auto profileNumZones = "profileNumZones";
+inline constexpr auto profileNumBands = "profileNumBands";
 } // namespace param
 
 struct RuntimeSettings
@@ -40,6 +46,12 @@ struct RuntimeSettings
     float noiseGateDb = -45.0f;
     float lookAheadMs = 0.0f;
     float presenceReleaseMs = 80.0f;
+
+    // Smart Track Profiler
+    bool profileActive = false;
+    int profileMaxMinutes = 5;
+    int profileNumZones = 3;
+    int profileNumBands = 3;
 };
 
 juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

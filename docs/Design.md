@@ -24,6 +24,13 @@ Target Gain Change = α × ΔRMS (受 Dynamics 模型缩放校调)
 除了宏观推子控制，底层管线还对伴奏通道施加了带有动态 Q 值的带通/带阻反向滤波器截取。
 它只针对人声基频活跃范围（如 300Hz ~ 5000Hz）进行避让，这意味着贝斯的低频冲击力以及镲片的高频空气感在动态回避时依旧可以保持饱满。
 
+### 2.4 智能音轨分析 (Smart Track Profiler) [v1.1 新增]
+为了解决全频段增益避让带来的“沉闷感”，v1.1 引入了 Smart Track Profiler。它的核心思想是“离线分析，实时插值”：
+1. **零分配录音 (Zero-Allocation Recording):** 用户点击 Listen 后，音频线程 (Audio Thread) 采用无锁 memcpy 方式将主通道与侧链通道的音频推入预分配的大容量环形缓冲区 (最大支持 10 分钟, 约 230MB)。
+2. **后台 FFT 分析 (Offline FFT Analysis):** 录制结束后，主线程唤起 Backend Background Thread。采用 1024-point FFT 和汉宁窗提取逐帧频谱，根据伴奏 LUFS 将数据划分为数个能量级别（Zones，如主歌、副歌）。在每个 Zone 内计算伴奏与人声的频谱碰撞分数 (Collision Score)，从而提取出需要避让的最优目标频段 (Center Hz, Q, Depth)。
+3. **多段动态 IIR 均衡器 (Multi-band Dynamic IIR EQ):** 在 Audio Thread 的处理阶段 (Stage 5.5)，引擎通过当前 LUFS 实时在不同的 Profile Zone 之间进行插值。利用带有 SIMD 优化的极轻量级 IIR 滤波器（Biquad），根据 `VoicePresence` 包络动态地对提取出的频段施加衰减。CPU 开销极低（3 个频段 CPU 占用增加不到 0.3%）。
+4. **多态存储 (Dual Storage):** 分析生成的配方（Profile）既被编码为二进制大对象直接打包在 DAW 的保存工程中，也支持导出为 JSON 文件用于跨工程共享。
+
 ## 3. UI 界面与交互构架
 
 使用了深度定制的 JUCE Component 构建了基于 OpenGL / 现代 2D 的渲染管线，摒弃了标准库死板的控件：

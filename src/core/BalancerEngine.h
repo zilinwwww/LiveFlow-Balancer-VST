@@ -6,6 +6,8 @@
 #include "LookAheadDelay.h"
 #include "LoudnessEstimator.h"
 #include "PluginParameters.h"
+#include "SpectralDuckEQ.h"
+#include "TrackProfile.h"
 #include "VisualizationState.h"
 
 namespace liveflow
@@ -49,6 +51,7 @@ public:
         lookAheadDelay.prepare (mainChannelCount, maxDelaySamples);
         mainLoudness.prepare (sampleRate, mainChannelCount);
         sidechainLoudness.prepare (sampleRate, sidechainChannelCount);
+        spectralDuckEQ.prepare (sampleRate, mainChannelCount);
 
         // GUI drawing should run around 90 FPS max
         visualUpdateInterval = juce::jmax (24, static_cast<int> (sampleRate / 90.0));
@@ -72,6 +75,7 @@ public:
         lookAheadDelay.reset();
         mainLoudness.reset();
         sidechainLoudness.reset();
+        spectralDuckEQ.reset();
 
         targetGainDb = 0.0f;
         smoothedGainDb = 0.0f;
@@ -217,6 +221,13 @@ public:
             smoothedGainDb = math::smoothTowards (smoothedGainDb, targetGainDb, smoothing);
 
             // ═══════════════════════════════════════════
+            // Stage 5.5: Spectral Duck EQ (Profile-driven)
+            // ═══════════════════════════════════════════
+
+            if (spectralDuckActive)
+                spectralDuckEQ.updatePresence (voicePresence);
+
+            // ═══════════════════════════════════════════
             // Stage 6: Render Multiplied Audio with Latency Match
             // ═══════════════════════════════════════════
 
@@ -226,7 +237,11 @@ public:
             {
                 // De-reference history circular buff samples to naturally push peaks backward in time
                 auto delayedSample = lookAheadDelay.processSample (channel, mainFrame[static_cast<size_t> (channel)]);
-                
+
+                // Stage 5.5: Apply spectral notch filtering if a Profile is active
+                if (spectralDuckActive)
+                    delayedSample = spectralDuckEQ.processSample (channel, delayedSample);
+
                 // IN-PLACE array update sent directly back to Host/DAW Memory Bus
                 mainBuffer.getWritePointer (channel)[sample] = delayedSample * gain;
             }
@@ -259,6 +274,44 @@ public:
         return latencySamples;
     }
 
+    // ── Profile-driven Spectral Ducking ──
+
+    /**
+     * @brief Inject a Profile energy zone's parameters into the engine.
+     * Updates both the macro RuntimeSettings and the SpectralDuckEQ bands.
+     */
+    void applyProfileZone (const EnergyZone& zone) noexcept
+    {
+        // Override macro settings from the profile zone
+        RuntimeSettings profileSettings = settings;
+        profileSettings.balanceDb = zone.balanceDb;
+        profileSettings.dynamicsPercent = zone.dynamicsPercent;
+        profileSettings.speedMs = zone.speedMs;
+        profileSettings.rangeDb = zone.rangeDb;
+        profileSettings.anchorManualDb = zone.anchorDb;
+        profileSettings.anchorAutoMode = false; // Profile provides explicit anchor
+        profileSettings.noiseGateDb = zone.noiseGateDb;
+        profileSettings.duckFloorDb = zone.duckFloorDb;
+        profileSettings.boostCeilingDb = zone.boostCeilingDb;
+        profileSettings.presenceReleaseMs = zone.presenceReleaseMs;
+        updateSettings (profileSettings);
+
+        // Update spectral EQ bands
+        spectralDuckEQ.updateBands (zone.duckBands);
+    }
+
+    void setSpectralDuckEnabled (bool enabled) noexcept
+    {
+        spectralDuckActive = enabled;
+
+        if (! enabled)
+            spectralDuckEQ.reset();
+    }
+
+    [[nodiscard]] bool isSpectralDuckEnabled() const noexcept { return spectralDuckActive; }
+
+    [[nodiscard]] const SpectralDuckEQ<SampleType>& getSpectralDuckEQ() const noexcept { return spectralDuckEQ; }
+
 private:
     double sampleRate = 44100.0;
     int mainChannelCount = 2;
@@ -285,5 +338,9 @@ private:
     LookAheadDelay<SampleType> lookAheadDelay;
     LoudnessEstimator<SampleType> mainLoudness;
     LoudnessEstimator<SampleType> sidechainLoudness;
+
+    // Profile-driven spectral ducking
+    SpectralDuckEQ<SampleType> spectralDuckEQ;
+    bool spectralDuckActive = false;
 };
 } // namespace liveflow

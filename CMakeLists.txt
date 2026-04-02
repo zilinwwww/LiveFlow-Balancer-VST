@@ -4,9 +4,9 @@ if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Build macOS Universal Binaries")
 endif()
 
-project(LiveFlowBalancer VERSION 1.0.2604 LANGUAGES C CXX)
+project(LiveFlowBalancer VERSION 1.1.0 LANGUAGES C CXX)
 
-set(LIVEFLOW_VERSION_SUFFIX "-alpha-2")
+set(LIVEFLOW_VERSION_SUFFIX "-260402-pre-alpha")
 set(LIVEFLOW_VERSION_STRING "v${PROJECT_VERSION}${LIVEFLOW_VERSION_SUFFIX}")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -73,6 +73,10 @@ add_library(liveflow_core STATIC
     src/core/LoudnessEstimator.h
     src/core/PluginParameters.cpp
     src/core/PluginParameters.h
+    src/core/SpectralAnalyzer.h
+    src/core/SpectralDuckEQ.h
+    src/core/TrackProfile.h
+    src/core/TrackProfiler.h
     src/core/VisualizationState.cpp
     src/core/VisualizationState.h)
 
