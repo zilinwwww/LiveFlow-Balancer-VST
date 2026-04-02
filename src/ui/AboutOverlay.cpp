@@ -13,6 +13,10 @@ AboutOverlay::AboutOverlay()
     closeButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0x10ffffff));
     closeButton.setColour (juce::TextButton::textColourOffId, juce::Colour (0xffeef5fb));
     closeButton.onClick = [this] { if (onClose) onClose(); };
+
+    addAndMakeVisible (githubLink);
+    githubLink.setFont (juce::FontOptions (11.5f), false);
+    githubLink.setColour (juce::HyperlinkButton::textColourId, juce::Colour (0xff3ecfd5));
 }
 
 juce::Rectangle<float> AboutOverlay::getCardBounds() const
@@ -77,11 +81,12 @@ void AboutOverlay::paint (juce::Graphics& graphics)
     graphics.drawText ("Version: " + juce::String (LIVEFLOW_VERSION_EXT),
                        versionArea.removeFromTop (20.0f), juce::Justification::centredLeft);
 
-    // Copyright
+    // MIT License label (link is a child component positioned in resized())
+    versionArea.removeFromTop (4.0f);
     graphics.setColour (juce::Colour (0xff6b7f96));
     graphics.setFont (juce::FontOptions (11.0f));
-    graphics.drawText ("MIT License  |  github.com/zilinwwww/LiveFlow-Balancer-VST",
-                       versionArea.removeFromTop (18.0f), juce::Justification::centredLeft);
+    graphics.drawText ("GPLv3 License",
+                       versionArea.removeFromTop (18.0f).removeFromLeft (85), juce::Justification::centredLeft);
 }
 
 void AboutOverlay::resized()
@@ -94,6 +99,11 @@ void AboutOverlay::resized()
         juce::roundToInt (headerArea.getRight() - 50.0f),
         juce::roundToInt (headerArea.getY()),
         50, 50).reduced (10));
+
+    // Position the GitHub hyperlink at the bottom of the card
+    auto linkArea = cardBounds.reduced (28.0f, 0.0f);
+    auto bottomArea = linkArea.removeFromBottom (40.0f);
+    githubLink.setBounds (bottomArea.removeFromLeft (300).removeFromBottom (20).toNearestInt());
 }
 
 void AboutOverlay::mouseDown (const juce::MouseEvent& event)

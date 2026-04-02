@@ -20,6 +20,8 @@ public:
 
 private:
     juce::TextButton closeButton { "X" };
+    juce::HyperlinkButton githubLink { "github.com/zilinwwww/LiveFlow-Balancer-VST",
+                                        juce::URL ("https://github.com/zilinwwww/LiveFlow-Balancer-VST") };
     bool currentIsChinese = false;
 
     juce::Rectangle<float> getCardBounds() const;

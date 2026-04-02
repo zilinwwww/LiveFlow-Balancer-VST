@@ -35,7 +35,7 @@ inline juce::String getText (const juce::String& key, Language lang)
         { "Btn_Help", "Help" },
         { "Btn_About", "About" },
         { "About_Title", "About LiveFlow Balancer" },
-        { "About_Desc", "LiveFlow Balancer v1.0\n\nAdvanced vocal-aware backing rider." },
+        { "About_Desc", "An intelligent, bidirectional, LUFS-aware dynamic gain adjustment plugin (Fader Riding).\nDesigned for live streaming, podcasting, and post-production to automatically balance backing track and vocal levels." },
 
         { "Label_Balance", "Balance" },
         { "Label_Dynamics", "Dynamics" },
@@ -53,8 +53,7 @@ inline juce::String getText (const juce::String& key, Language lang)
         { "Label_LookAhead", "Look Ahead" },
         { "Label_ReleaseHyst", "Release Hyst" },
 
-        { "Header_Title", "LIVEFLOW USER MANUAL" },
-        { "Header_Sub", "Adaptive vocal-aware backing rider" }
+        { "Header_Title", "LIVEFLOW USER MANUAL" }
     };
 
     static const std::map<juce::String, juce::String> dictZH = {
@@ -63,7 +62,7 @@ inline juce::String getText (const juce::String& key, Language lang)
         { "Btn_Help", ZH("帮助") },
         { "Btn_About", ZH("关于") },
         { "About_Title", ZH("关于 LiveFlow Balancer") },
-        { "About_Desc", ZH("LiveFlow Balancer v1.0\n\n高级人声动态伴奏避让与骑推子效果器。") },
+        { "About_Desc", ZH("一款智能、双向、感知 LUFS 响度的动态增减益调节插件（Fader Riding）。\n专为直播、播客和后期制作自动平衡伴奏与人声音量而设计。") },
 
         { "Label_Balance", ZH("平衡") },
         { "Label_Dynamics", ZH("动态") },
@@ -81,8 +80,7 @@ inline juce::String getText (const juce::String& key, Language lang)
         { "Label_LookAhead", ZH("预读取") },
         { "Label_ReleaseHyst", ZH("脱扣延迟") },
 
-        { "Header_Title", ZH("LIVEFLOW 帮助手册") },
-        { "Header_Sub", ZH("智能人声避让骑推子器") }
+        { "Header_Title", ZH("LIVEFLOW 帮助手册") }
     };
 
     const auto& activeDict = (lang == Language::Chinese) ? dictZH : dictEN;

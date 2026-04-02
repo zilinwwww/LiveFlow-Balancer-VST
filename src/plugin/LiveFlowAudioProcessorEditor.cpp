@@ -224,10 +224,6 @@ void LiveFlowAudioProcessorEditor::paint (juce::Graphics& graphics)
     graphics.setColour (juce::Colour (0x88eff5fb));
     graphics.setFont (juce::FontOptions (10.0f, juce::Font::bold));
     graphics.drawText (juce::String(LIVEFLOW_VERSION_EXT), titleArea.removeFromLeft (85), juce::Justification::centredLeft);
-    graphics.setColour (juce::Colour (0xff9fb0c7));
-    graphics.setFont (juce::FontOptions (9.5f));
-    const auto lang = isChinese ? i18n::Language::Chinese : i18n::Language::English;
-    graphics.drawText (i18n::getText ("Header_Sub", lang), titleArea, juce::Justification::centredLeft);
 }
 
 void LiveFlowAudioProcessorEditor::resized()
