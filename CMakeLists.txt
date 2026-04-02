@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(LiveFlowBalancer VERSION 1.0.2604 LANGUAGES C CXX)
+project(LiveFlowBalancer VERSION 1.0.2604a2 LANGUAGES C CXX)
 
-set(LIVEFLOW_VERSION_STRING "v1.0.2604a1")
+set(LIVEFLOW_VERSION_STRING "v${PROJECT_VERSION}")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -126,7 +126,7 @@ juce_add_plugin(LiveFlowBalancer
     PLUGIN_CODE Lfb1
     VST3_CATEGORIES Fx Dynamics
     FORMATS ${LIVEFLOW_PLUGIN_FORMATS}
-    VERSION 1.0.2604
+    VERSION ${PROJECT_VERSION}
     PRODUCT_NAME "LiveFlow Balancer"
     PLUGIN_NAME "LiveFlow Balancer")
 
