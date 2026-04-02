@@ -53,6 +53,25 @@ inline juce::String getText (const juce::String& key, Language lang)
         { "Label_LookAhead", "Look Ahead" },
         { "Label_ReleaseHyst", "Release Hyst" },
 
+        // Smart Track Profiler
+        { "Btn_Listen", "Listen" },
+        { "Btn_StopListen", "Stop" },
+        { "Btn_Cancel", "Cancel" },
+        { "Btn_Export", "Export" },
+        { "Btn_Import", "Import" },
+        { "Btn_Delete", "Delete" },
+        { "Label_Profile", "Profile" },
+        { "Label_NumZones", "Zones" },
+        { "Label_NumBands", "EQ Bands" },
+        { "Label_MaxRecord", "Max Record" },
+        { "Profile_None", "No Profile" },
+        { "Profile_Recording", "Recording..." },
+        { "Profile_Analyzing", "Analyzing..." },
+        { "Profile_Ready", "Ready" },
+        { "Profile_Error", "Error" },
+        { "Panel_Profiler", "Smart Track Profiler" },
+        { "Zone_Active", "Active Zone" },
+
         { "Header_Title", "LIVEFLOW USER MANUAL" },
         { "Header_Sub", "Adaptive vocal-aware backing rider" }
     };
@@ -80,6 +99,25 @@ inline juce::String getText (const juce::String& key, Language lang)
         { "Label_NoiseGate", ZH("噪声门") },
         { "Label_LookAhead", ZH("预读取") },
         { "Label_ReleaseHyst", ZH("脱扣延迟") },
+
+        // Smart Track Profiler
+        { "Btn_Listen", ZH("智能听诊") },
+        { "Btn_StopListen", ZH("停止") },
+        { "Btn_Cancel", ZH("取消") },
+        { "Btn_Export", ZH("导出") },
+        { "Btn_Import", ZH("导入") },
+        { "Btn_Delete", ZH("删除") },
+        { "Label_Profile", ZH("声学配方") },
+        { "Label_NumZones", ZH("区间数") },
+        { "Label_NumBands", ZH("EQ段数") },
+        { "Label_MaxRecord", ZH("最大录制") },
+        { "Profile_None", ZH("无配方") },
+        { "Profile_Recording", ZH("录制中...") },
+        { "Profile_Analyzing", ZH("分析中...") },
+        { "Profile_Ready", ZH("已就绪") },
+        { "Profile_Error", ZH("分析出错") },
+        { "Panel_Profiler", ZH("智能音轨分析") },
+        { "Zone_Active", ZH("活跃区间") },
 
         { "Header_Title", ZH("LIVEFLOW 帮助手册") },
         { "Header_Sub", ZH("智能人声避让骑推子器") }

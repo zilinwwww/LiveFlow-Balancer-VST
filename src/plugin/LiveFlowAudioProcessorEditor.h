@@ -12,6 +12,8 @@
 #include "ui/Translations.h"
 #include "ui/VisualizerComponent.h"
 
+#include "core/TrackProfiler.h"
+
 namespace liveflow
 {
 class LiveFlowAudioProcessor;
@@ -109,7 +111,32 @@ private:
     
     // Overlays must be last to render top-most!
     HelpOverlay helpOverlay;
-    
+
+    // ── Smart Track Profiler Panel ──
+    juce::TextButton listenButton;       // Start/Stop recording
+    juce::ComboBox profileSelector;      // Profile dropdown
+    juce::TextButton exportButton;
+    juce::TextButton importButton;
+    juce::TextButton deleteButton;
+    juce::Label profilerStatusLabel;
+    juce::Label recordingTimeLabel;
+
+    // Profiler settings knobs
+    CompactKnob maxRecordKnob;
+    CompactKnob numZonesKnob;
+    CompactKnob numBandsKnob;
+
+    // Profiler parameter attachments
+    std::unique_ptr<ButtonAttachment> profileActiveAttachment;
+    std::unique_ptr<SliderAttachment> maxRecordAttachment;
+    std::unique_ptr<SliderAttachment> numZonesAttachment;
+    std::unique_ptr<SliderAttachment> numBandsAttachment;
+
+    // Profiler panel state
+    bool profilerPanelVisible = true;
+    void updateProfileSelector();
+    void updateProfilerUI();
+
     bool isChinese = juce::SystemStats::getUserLanguage().startsWithIgnoreCase("zh");
     void updateAllTexts();
 
