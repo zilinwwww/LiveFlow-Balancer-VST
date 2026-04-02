@@ -71,6 +71,9 @@ void LiveFlowAudioProcessor::prepareToPlay (const double sampleRate, const int s
     floatEngine.updateSettings (settings);
     doubleEngine.updateSettings (settings);
     updateLatencyIfNeeded (0);
+
+    // Prepare profiler with current settings
+    profiler.prepare (sampleRate, settings.profileMaxMinutes, mainOutputChannels);
 }
 
 void LiveFlowAudioProcessor::releaseResources()
@@ -79,6 +82,7 @@ void LiveFlowAudioProcessor::releaseResources()
     doubleEngine.reset();
     sidechainScratchFloat.clear();
     sidechainScratchDouble.clear();
+    profiler.reset();
 }
 
 bool LiveFlowAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -124,6 +128,35 @@ void LiveFlowAudioProcessor::processBlockInternal (juce::AudioBuffer<SampleType>
     copySidechainBusToScratch (*this, buffer, sidechainScratch);
     const bool sidechainActive = getBusCount (true) > 1 && getBus (true, 1) != nullptr && getBus (true, 1)->isEnabled();
     const juce::AudioBuffer<SampleType>* sidechainBuffer = sidechainActive ? &sidechainScratch : nullptr;
+
+    // Feed audio to profiler if recording (zero-allocation memcpy)
+    // Only push from the float specialization since profiler buffers are float
+    if constexpr (std::is_same_v<SampleType, float>)
+    {
+        if (profiler.getState() == ProfilerState::Recording)
+            profiler.pushAudioBlock (mainOutputBus, sidechainBuffer);
+    }
+
+    // Apply active profile zone interpolation
+    if (settings.profileActive && activeProfileIndex >= 0
+        && activeProfileIndex < static_cast<int> (profiles.size()))
+    {
+        engine.setSpectralDuckEnabled (true);
+        // Use the current backing LUFS to interpolate between zones
+        const auto currentLufs = visualizationState.capture().backingLufs;
+        const auto& profile = profiles[static_cast<size_t> (activeProfileIndex)];
+        const auto zone = profile.interpolate (currentLufs);
+        engine.applyProfileZone (zone);
+
+        // Update active zone index for UI
+        const auto zoneIdx = profile.findZoneIndex (currentLufs);
+        visualizationState.setActiveZoneIndex (zoneIdx);
+    }
+    else
+    {
+        engine.setSpectralDuckEnabled (false);
+        visualizationState.setActiveZoneIndex (-1);
+    }
 
     engine.process (mainOutputBus, sidechainBuffer, visualizationState);
 
@@ -194,14 +227,57 @@ juce::AudioProcessorEditor* LiveFlowAudioProcessor::createEditor()
 
 void LiveFlowAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
+    // Save parameter state
+    juce::MemoryOutputStream stream (destData, false);
+
+    // Write parameter tree
     if (auto xml = parameters.copyState().createXml())
-        copyXmlToBinary (*xml, destData);
+    {
+        const auto xmlString = xml->toString();
+        stream.writeInt (static_cast<int> (xmlString.getNumBytesAsUTF8()));
+        stream.writeString (xmlString);
+    }
+    else
+    {
+        stream.writeInt (0);
+    }
+
+    // Write profiles
+    stream.writeInt (static_cast<int> (profiles.size()));
+
+    for (const auto& profile : profiles)
+        profile.writeTo (stream);
+
+    stream.writeInt (activeProfileIndex);
 }
 
 void LiveFlowAudioProcessor::setStateInformation (const void* data, const int sizeInBytes)
 {
-    if (auto xml = getXmlFromBinary (data, sizeInBytes))
-        parameters.replaceState (juce::ValueTree::fromXml (*xml));
+    juce::MemoryInputStream stream (data, static_cast<size_t> (sizeInBytes), false);
+
+    // Read parameter tree
+    const auto xmlSize = stream.readInt();
+
+    if (xmlSize > 0)
+    {
+        const auto xmlString = stream.readString();
+
+        if (auto xml = juce::parseXML (xmlString))
+            parameters.replaceState (juce::ValueTree::fromXml (*xml));
+    }
+
+    // Read profiles
+    if (! stream.isExhausted())
+    {
+        profiles.clear();
+        const auto numProfiles = stream.readInt();
+
+        for (int i = 0; i < numProfiles && ! stream.isExhausted(); ++i)
+            profiles.push_back (TrackProfile::readFrom (stream));
+
+        if (! stream.isExhausted())
+            activeProfileIndex = stream.readInt();
+    }
 }
 
 void LiveFlowAudioProcessor::updateLatencyIfNeeded (const int desiredLatencySamples)
@@ -212,6 +288,82 @@ void LiveFlowAudioProcessor::updateLatencyIfNeeded (const int desiredLatencySamp
         setLatencySamples (cachedLatencySamples);
     }
 }
+
+// ─────────────────────────────────────────────────────────
+// Smart Track Profiler API
+// ─────────────────────────────────────────────────────────
+
+void LiveFlowAudioProcessor::startProfiling()
+{
+    const auto settings = loadRuntimeSettings (parameters);
+    profiler.prepare (getSampleRate(), settings.profileMaxMinutes,
+                      juce::jmax (1, getChannelCountOfBus (false, 0)));
+    profiler.startRecording();
+}
+
+void LiveFlowAudioProcessor::stopProfiling (const juce::String& profileName)
+{
+    const auto settings = loadRuntimeSettings (parameters);
+    profiler.stopRecording (settings.profileNumZones, settings.profileNumBands, profileName);
+}
+
+void LiveFlowAudioProcessor::cancelProfiling()
+{
+    profiler.cancelRecording();
+}
+
+void LiveFlowAudioProcessor::deleteProfile (int index)
+{
+    if (index >= 0 && index < static_cast<int> (profiles.size()))
+    {
+        profiles.erase (profiles.begin() + index);
+
+        if (activeProfileIndex == index)
+            setActiveProfileIndex (-1);
+        else if (activeProfileIndex > index)
+            --activeProfileIndex;
+    }
+}
+
+void LiveFlowAudioProcessor::setActiveProfileIndex (int index)
+{
+    if (index >= 0 && index < static_cast<int> (profiles.size()))
+    {
+        activeProfileIndex = index;
+        lastAppliedZoneIndex = -1;
+    }
+    else
+    {
+        activeProfileIndex = -1;
+        floatEngine.setSpectralDuckEnabled (false);
+        doubleEngine.setSpectralDuckEnabled (false);
+    }
+}
+
+void LiveFlowAudioProcessor::exportProfileToJSON (int index, const juce::File& destination)
+{
+    if (index >= 0 && index < static_cast<int> (profiles.size()))
+        profiles[static_cast<size_t> (index)].saveToFile (destination);
+}
+
+void LiveFlowAudioProcessor::importProfileFromJSON (const juce::File& source)
+{
+    auto imported = TrackProfile::loadFromFile (source);
+
+    if (! imported.zones.empty())
+        profiles.push_back (std::move (imported));
+}
+
+void LiveFlowAudioProcessor::applyActiveProfile (float currentBackingLufs)
+{
+    if (activeProfileIndex < 0 || activeProfileIndex >= static_cast<int> (profiles.size()))
+        return;
+
+    const auto& profile = profiles[static_cast<size_t> (activeProfileIndex)];
+    const auto zone = profile.interpolate (currentBackingLufs);
+    floatEngine.applyProfileZone (zone);
+}
+
 } // namespace liveflow
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()

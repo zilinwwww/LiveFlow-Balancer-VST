@@ -4,6 +4,8 @@
 
 #include "core/BalancerEngine.h"
 #include "core/PluginParameters.h"
+#include "core/TrackProfile.h"
+#include "core/TrackProfiler.h"
 #include "core/VisualizationState.h"
 
 namespace liveflow
@@ -48,6 +50,20 @@ public:
     [[nodiscard]] VisualizationState& getVisualizationState() noexcept { return visualizationState; }
     [[nodiscard]] const VisualizationState& getVisualizationState() const noexcept { return visualizationState; }
 
+    // ── Smart Track Profiler API (called from Editor/Message Thread) ──
+    void startProfiling();
+    void stopProfiling (const juce::String& profileName);
+    void cancelProfiling();
+    void deleteProfile (int index);
+    void setActiveProfileIndex (int index); // -1 = disable
+    void exportProfileToJSON (int index, const juce::File& destination);
+    void importProfileFromJSON (const juce::File& source);
+
+    [[nodiscard]] const std::vector<TrackProfile>& getProfiles() const noexcept { return profiles; }
+    [[nodiscard]] int getActiveProfileIndex() const noexcept { return activeProfileIndex; }
+    [[nodiscard]] TrackProfiler& getProfiler() noexcept { return profiler; }
+    [[nodiscard]] const TrackProfiler& getProfiler() const noexcept { return profiler; }
+
 private:
     template <typename SampleType>
     void processBlockInternal (juce::AudioBuffer<SampleType>& buffer,
@@ -55,6 +71,7 @@ private:
                                juce::AudioBuffer<SampleType>& sidechainScratch);
 
     void updateLatencyIfNeeded (const int desiredLatencySamples);
+    void applyActiveProfile (float currentBackingLufs);
 
     juce::AudioProcessorValueTreeState parameters;
     VisualizationState visualizationState;
@@ -63,6 +80,12 @@ private:
     juce::AudioBuffer<float> sidechainScratchFloat;
     juce::AudioBuffer<double> sidechainScratchDouble;
     int cachedLatencySamples = 0;
+
+    // Smart Track Profiler
+    TrackProfiler profiler;
+    std::vector<TrackProfile> profiles;
+    int activeProfileIndex = -1;
+    int lastAppliedZoneIndex = -1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LiveFlowAudioProcessor)
 };

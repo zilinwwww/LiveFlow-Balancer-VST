@@ -39,7 +39,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
     using Attributes = juce::AudioParameterFloatAttributes;
 
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
-    parameters.reserve (11);
+    parameters.reserve (16);
 
     // ── Core Parameters ──
 
@@ -145,6 +145,38 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
             .withLabel (" ms")
             .withStringFromValueFunction ([] (float value, int) { return withUnit (value, " ms"); })));
 
+    // ── Smart Track Profiler Parameters ──
+
+    parameters.push_back (std::make_unique<BoolParameter> (
+        juce::ParameterID { param::profileActive, 1 },
+        "Profile Active",
+        false));
+
+    parameters.push_back (std::make_unique<Parameter> (
+        juce::ParameterID { param::profileMaxMinutes, 1 },
+        "Max Record",
+        juce::NormalisableRange<float> (1.0f, 10.0f, 1.0f),
+        5.0f,
+        Attributes {}
+            .withLabel (" min")
+            .withStringFromValueFunction ([] (float value, int) { return withUnit (value, " min"); })));
+
+    parameters.push_back (std::make_unique<Parameter> (
+        juce::ParameterID { param::profileNumZones, 1 },
+        "Zones",
+        juce::NormalisableRange<float> (2.0f, 8.0f, 1.0f),
+        3.0f,
+        Attributes {}
+            .withStringFromValueFunction ([] (float value, int) { return juce::String (static_cast<int> (value)); })));
+
+    parameters.push_back (std::make_unique<Parameter> (
+        juce::ParameterID { param::profileNumBands, 1 },
+        "EQ Bands",
+        juce::NormalisableRange<float> (1.0f, 8.0f, 1.0f),
+        3.0f,
+        Attributes {}
+            .withStringFromValueFunction ([] (float value, int) { return juce::String (static_cast<int> (value)); })));
+
     return { parameters.begin(), parameters.end() };
 }
 
@@ -167,7 +199,11 @@ RuntimeSettings loadRuntimeSettings (const juce::AudioProcessorValueTreeState& v
         .duckFloorDb = valueOf (param::duckFloor),
         .noiseGateDb = valueOf (param::noiseGate),
         .lookAheadMs = valueOf (param::lookAhead),
-        .presenceReleaseMs = valueOf (param::presenceRelease)
+        .presenceReleaseMs = valueOf (param::presenceRelease),
+        .profileActive = valueTreeState.getRawParameterValue (param::profileActive)->load() > 0.5f,
+        .profileMaxMinutes = static_cast<int> (valueOf (param::profileMaxMinutes)),
+        .profileNumZones = static_cast<int> (valueOf (param::profileNumZones)),
+        .profileNumBands = static_cast<int> (valueOf (param::profileNumBands))
     };
 }
 } // namespace liveflow

@@ -108,6 +108,10 @@ public:
      */
     [[nodiscard]] Snapshot capture() const noexcept;
 
+    // Smart Track Profiler state updates (called from AudioProcessor)
+    void setActiveZoneIndex (int index) noexcept { activeZoneIndex.store (index, std::memory_order_relaxed); }
+    void setProfileActive (bool active) noexcept { profileActive.store (active, std::memory_order_relaxed); }
+
 private:
     // Current state atomics (Relaxed Ordering is sufficient)
     std::atomic<float> currentVocalLufs { -70.0f };
@@ -150,5 +154,9 @@ private:
     std::atomic<int> sidechainMap1 { -1 };
     std::atomic<bool> sidechainBusPresent { false };
     std::atomic<bool> sidechainBusEnabled { false };
+
+    // Smart Track Profiler state
+    std::atomic<int> activeZoneIndex { -1 };
+    std::atomic<bool> profileActive { false };
 };
 } // namespace liveflow

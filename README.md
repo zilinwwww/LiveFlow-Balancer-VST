@@ -11,7 +11,7 @@ A smart, bi-directional, LUFS-aware dynamic fader riding plugin. Designed to aut
 ![Version](https://img.shields.io/badge/Version-v1.0.2604a1-green.svg)
 
 ## 📌 Features
-- **Smart Gain Riding (Auto-Fader)**: Bi-directional control. It lifts the backing track when the vocal is too quiet, and smoothly pushes the backing track down when the vocal hits hard.
+- **Smart Gain Riding (Auto-Fader)**: Bi-directional balance control. It continuously maintains the ideal loudness relationship between your vocal and backing track — automatically ducking the backing when it's too loud relative to the vocal, and boosting it when it's too quiet, ensuring both sit perfectly in the mix at all times.
 
 - **Real-Time Visualization**: Features a FabFilter-style rolling gain timeline, providing immediate feedback on tracking hysteresis, voice presence detection, and fader movements.
 - **Internationalization & Locale Detection**: Complete, zero-dependency English and Simplified Chinese user manual/UI toggling builtin. The plugin features **OS-locale Auto-Sensing**, instantly switching to the native UI based on your operating system region out-of-the-box.
@@ -97,7 +97,7 @@ This plugin is licensed under the GPLv3 License, subject to the inherent licensi
 ![Version](https://img.shields.io/badge/Version-v1.0.2604a1-green.svg)
 
 ## 📌 核心功能
-- **智能增益调节 (Auto-Fader)**：双向控制。当人声太小，它会自动提升伴奏音量进行托底；当人声爆发时，又会平滑地将伴奏避让压低。
+- **智能增益调节 (Auto-Fader)**：双向平衡控制。它实时维持人声与伴奏之间的最佳响度关系——当伴奏相对于人声过响时自动压低伴奏，当伴奏相对于人声过弱时自动推高伴奏，确保两者在任何时刻都完美融合。
 
 - **实时可视化**：提供类似 FabFilter 风格的滚动增益时间线，让你可以随时直观地掌控追踪滞后、人声检测阈值以及推子的动态游走状态。
 - **国际化与多语言侦测**：内置零依赖的完全纯净的英文/简体中文使用手册与 UI 切换引擎。插件支持**操作系统语言自适应 (OS-locale Auto-Sensing)**，开箱即用，会根据操作系统的地区自动切换到你熟悉的母语界面。
