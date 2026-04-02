@@ -100,10 +100,11 @@ void AboutOverlay::resized()
         juce::roundToInt (headerArea.getY()),
         50, 50).reduced (10));
 
-    // Position the GitHub hyperlink at the bottom of the card
-    auto linkArea = cardBounds.reduced (28.0f, 0.0f);
-    auto bottomArea = linkArea.removeFromBottom (40.0f);
-    githubLink.setBounds (bottomArea.removeFromLeft (300).removeFromBottom (20).toNearestInt());
+    // Position the GitHub hyperlink right after version + license area
+    auto contentArea = cardBounds.removeFromTop (cardBounds.getHeight()).reduced (28.0f, 20.0f);
+    // Skip past: description (~60) + gap (12) + version (20) + gap (4) + license (18) + gap (6)
+    contentArea.removeFromTop (120.0f);
+    githubLink.setBounds (contentArea.removeFromTop (20).removeFromLeft (300).toNearestInt());
 }
 
 void AboutOverlay::mouseDown (const juce::MouseEvent& event)

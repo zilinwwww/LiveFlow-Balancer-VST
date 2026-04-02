@@ -223,7 +223,9 @@ void LiveFlowAudioProcessorEditor::paint (juce::Graphics& graphics)
 
     graphics.setColour (juce::Colour (0x88eff5fb));
     graphics.setFont (juce::FontOptions (10.0f, juce::Font::bold));
-    graphics.drawText (juce::String(LIVEFLOW_VERSION_EXT), titleArea.removeFromLeft (85), juce::Justification::centredLeft);
+    const auto versionStr = juce::String (LIVEFLOW_VERSION_EXT);
+    auto versionWidth = graphics.getCurrentFont().getStringWidthFloat (versionStr) + 8.0f;
+    graphics.drawText (versionStr, titleArea.removeFromLeft (static_cast<int> (versionWidth)), juce::Justification::centredLeft);
 }
 
 void LiveFlowAudioProcessorEditor::resized()
