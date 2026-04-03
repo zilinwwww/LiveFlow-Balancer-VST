@@ -4,9 +4,9 @@ if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Build macOS Universal Binaries")
 endif()
 
-project(LiveFlowBalancer VERSION 1.0.2604 LANGUAGES C CXX)
+project(LiveFlowBalancer VERSION 1.0.0 LANGUAGES C CXX)
 
-set(LIVEFLOW_VERSION_SUFFIX "-alpha-2")
+set(LIVEFLOW_VERSION_SUFFIX "-rc1")
 set(LIVEFLOW_VERSION_STRING "v${PROJECT_VERSION}${LIVEFLOW_VERSION_SUFFIX}")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -103,6 +103,7 @@ function(configure_liveflow_plugin_target target_name)
         PRIVATE
             LiveFlowAssets
             juce::juce_audio_utils
+            juce::juce_cryptography
         PUBLIC
             juce::juce_recommended_config_flags
             juce::juce_recommended_lto_flags
@@ -141,6 +142,10 @@ target_sources(LiveFlowBalancer
         src/plugin/LiveFlowAudioProcessor.h
         src/plugin/LiveFlowAudioProcessorEditor.cpp
         src/plugin/LiveFlowAudioProcessorEditor.h
+        src/licensing/MachineFingerprint.h
+        src/licensing/LicenseEncryption.h
+        src/licensing/LicenseManager.h
+        src/ui/ActivationOverlay.h
         src/ui/CompactKnob.h
         src/ui/GainTimelineComponent.h
         src/ui/LiveFlowLookAndFeel.cpp

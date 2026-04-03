@@ -172,6 +172,17 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
     helpOverlay.setVisible (false);
     helpOverlay.onClose = [this] { helpOverlay.setVisible (false); };
 
+    // Activation overlay — shown when not licensed
+    addChildComponent (activationOverlay);
+    activationOverlay.onActivated = [this]
+    {
+        activationOverlay.setVisible (false);
+        resized();
+        repaint();
+    };
+    if (! licenseManager.isLicensed())
+        activationOverlay.setVisible (true);
+
     updateAllTexts();
 
     startTimerHz (30);
@@ -186,6 +197,29 @@ LiveFlowAudioProcessorEditor::~LiveFlowAudioProcessorEditor()
 
 void LiveFlowAudioProcessorEditor::timerCallback()
 {
+    // Background license validation (once, ~1s after startup)
+    if (licenseManager.isLicensed() && ! validationTriggered)
+    {
+        validationTriggered = true;
+        auto* mgr = &licenseManager;
+        auto safeThis = juce::Component::SafePointer<LiveFlowAudioProcessorEditor> (this);
+        juce::Thread::launch ([mgr, safeThis]
+        {
+            mgr->validateInBackground();
+            juce::MessageManager::callAsync ([safeThis]
+            {
+                if (safeThis == nullptr) return;
+                if (! safeThis->licenseManager.isLicensed())
+                {
+                    safeThis->activationOverlay.updateStatus();
+                    safeThis->activationOverlay.setVisible (true);
+                    safeThis->resized();
+                    safeThis->repaint();
+                }
+            });
+        });
+    }
+
     const auto snap = processor.getVisualizationState().capture();
     gainTimeline.updateFromSnapshot (snap);
     presenceIndicator.setPresence (snap.voicePresence);
@@ -317,6 +351,7 @@ void LiveFlowAudioProcessorEditor::resized()
     expertSection.setVisible (expertVisible);
 
     helpOverlay.setBounds (getLocalBounds());
+    activationOverlay.setBounds (getLocalBounds());
 }
 
 void LiveFlowAudioProcessorEditor::updateAllTexts()

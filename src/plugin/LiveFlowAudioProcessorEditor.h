@@ -11,6 +11,7 @@
 #include "ui/PresenceIndicator.h"
 #include "ui/Translations.h"
 #include "ui/VisualizerComponent.h"
+#include "ui/ActivationOverlay.h"
 
 namespace liveflow
 {
@@ -109,6 +110,11 @@ private:
     
     // Overlays must be last to render top-most!
     HelpOverlay helpOverlay;
+    
+    // Licensing
+    LicenseManager licenseManager;
+    ActivationOverlay activationOverlay { licenseManager };
+    bool validationTriggered = false;
     
     bool isChinese = juce::SystemStats::getUserLanguage().startsWithIgnoreCase("zh");
     void updateAllTexts();
