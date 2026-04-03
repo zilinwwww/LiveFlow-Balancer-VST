@@ -32,7 +32,6 @@ export function Navbar() {
             <span className="nav-email">{user.email} ▾</span>
             <div className="nav-dropdown">
               <Link to="/dashboard">{i('nav.dashboard')}</Link>
-              <Link to="/dashboard">{i('nav.licenses')}</Link>
               <button onClick={() => { logout(); navigate('/'); }}>{i('nav.logout')}</button>
             </div>
           </div>

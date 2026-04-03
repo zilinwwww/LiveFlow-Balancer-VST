@@ -1,12 +1,21 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLang } from '../contexts/LangContext';
 
 export function Home() {
   const { user } = useAuth();
   const { i } = useLang();
+  const location = useLocation();
   const [claimStatus, setClaimStatus] = useState<'idle' | 'loading' | 'done'>('idle');
+  const [isHighlighting, setIsHighlighting] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.highlightClaim) {
+      setIsHighlighting(true);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const handleClaim = async () => {
     setClaimStatus('loading');
@@ -34,9 +43,6 @@ export function Home() {
         <h2 className="section-title">{i('home.products')}</h2>
         <div className="product-grid">
           <div className="product-card">
-            <div className="product-screenshot">
-              <img src="/plugin-screenshot.png" alt="LiveFlow Balancer" />
-            </div>
             <div className="product-info">
               <h3>LiveFlow Balancer</h3>
               <p className="product-tag">{i('home.tag')}</p>
@@ -52,11 +58,14 @@ export function Home() {
                 ) : claimStatus === 'done' ? (
                   <Link to="/dashboard" className="btn btn-primary">{i('home.claimed')}</Link>
                 ) : (
-                  <button className="btn btn-primary" onClick={handleClaim} disabled={claimStatus === 'loading'}>
+                  <button className={`btn btn-primary ${isHighlighting ? 'btn-pulse' : ''}`} onClick={handleClaim} disabled={claimStatus === 'loading'}>
                     {claimStatus === 'loading' ? i('home.claiming') : i('home.getLicense')}
                   </button>
                 )}
               </div>
+            </div>
+            <div className="product-screenshot">
+              <img src="/plugin-screenshot.png" alt="LiveFlow Balancer" />
             </div>
           </div>
         </div>

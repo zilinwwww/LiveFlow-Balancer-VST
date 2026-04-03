@@ -26,7 +26,7 @@ export function Register() {
       if (data.status === 'ok') {
         setSuccess(true);
         refresh();
-        setTimeout(() => navigate('/dashboard'), 3000);
+        setTimeout(() => navigate('/', { state: { highlightClaim: true } }), 3000);
       } else {
         setError(data.code === 'EMAIL_EXISTS' ? i('reg.emailExists') : data.message || i('reg.failed'));
       }

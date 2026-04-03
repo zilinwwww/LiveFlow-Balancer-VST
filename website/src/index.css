@@ -149,7 +149,17 @@ a:hover { color: var(--accent-hover); }
   color: #000;
 }
 .btn-primary:hover { background: var(--accent-hover); color: #000; box-shadow: 0 0 20px rgba(62, 207, 213, 0.3); }
+.btn-primary:active { opacity: 0.8; }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@keyframes btnPulse {
+  0% { box-shadow: 0 0 0 0 rgba(79, 195, 247, 0.6); transform: scale(1); }
+  50% { box-shadow: 0 0 0 12px rgba(79, 195, 247, 0); transform: scale(1.02); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 195, 247, 0); transform: scale(1); }
+}
+.btn-pulse {
+  animation: btnPulse 2s infinite ease-out;
+}
 .btn-ghost {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-main);
