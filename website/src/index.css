@@ -250,6 +250,22 @@ a:hover { color: var(--accent-hover); }
   border: 1px solid rgba(255, 107, 107, 0.3);
   color: var(--error);
 }
+.alert-success {
+  background: rgba(129, 230, 157, 0.1);
+  border: 1px solid rgba(129, 230, 157, 0.3);
+  color: var(--success);
+  animation: fadeInUp 0.3s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.btn-lang {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  min-width: 42px;
+  letter-spacing: 0.5px;
+}
 
 /* ── Dashboard ── */
 .dashboard-page { max-width: 960px; }
