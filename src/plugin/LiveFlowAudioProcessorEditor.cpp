@@ -132,10 +132,10 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
     };
 
     addAndMakeVisible (websiteLink);
-    websiteLink.setButtonText ("liveflow.micro-grav.com/balancer");
+    websiteLink.setButtonText ("LiveFlow");
     websiteLink.setURL (juce::URL ("https://liveflow.micro-grav.com/balancer"));
     websiteLink.setColour (juce::HyperlinkButton::textColourId, coreAccent (4).withAlpha (0.7f));
-    websiteLink.setJustificationType (juce::Justification::centred);
+    websiteLink.setFont (juce::FontOptions(13.0f, juce::Font::bold), false, juce::Justification::centred);
 
     addAndMakeVisible (langButton);
     langButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0x10ffffff));
@@ -356,6 +356,7 @@ void LiveFlowAudioProcessorEditor::resized()
     expertSection.setVisible (expertVisible);
 
     helpOverlay.setBounds (getLocalBounds());
+    aboutOverlay.setBounds (getLocalBounds());
     activationOverlay.setBounds (getLocalBounds());
 }
 

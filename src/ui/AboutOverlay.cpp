@@ -12,10 +12,10 @@ AboutOverlay::AboutOverlay()
     closeButton.onClick = [this] { if (onClose) onClose(); };
 
     addAndMakeVisible (websiteLink);
-    websiteLink.setButtonText ("liveflow.micro-grav.com/balancer");
+    websiteLink.setButtonText ("LiveFlow");
     websiteLink.setURL (juce::URL ("https://liveflow.micro-grav.com/balancer"));
     websiteLink.setColour (juce::HyperlinkButton::textColourId, juce::Colour (0xff3ecfd5));
-    websiteLink.setJustificationType (juce::Justification::centred);
+    websiteLink.setFont (juce::FontOptions(13.0f, juce::Font::bold), false, juce::Justification::centred);
 }
 
 void AboutOverlay::paint (juce::Graphics& graphics)
