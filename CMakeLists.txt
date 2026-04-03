@@ -62,9 +62,11 @@ if (LIVEFLOW_PLUGIN_FORMATS STREQUAL "")
     message(FATAL_ERROR "At least one plugin format must be enabled.")
 endif ()
 
+file(GLOB_RECURSE WEB_UI_ASSETS "ui/dist/*")
 juce_add_binary_data(LiveFlowAssets
     SOURCES
-        assets/fonts/SpaceGrotesk-Variable.ttf)
+        assets/fonts/SpaceGrotesk-Variable.ttf
+        ${WEB_UI_ASSETS})
 
 add_library(liveflow_core STATIC
     src/core/BalancerEngine.h
@@ -87,9 +89,9 @@ target_link_libraries(liveflow_core
 
 target_compile_definitions(liveflow_core
     PUBLIC
-        JUCE_WEB_BROWSER=0
-        JUCE_USE_CURL=0
-        JUCE_VST3_CAN_REPLACE_VST2=0
+            JUCE_WEB_BROWSER=1
+            JUCE_USE_CURL=1
+            JUCE_VST3_CAN_REPLACE_VST2=0
         DONT_SET_USING_JUCE_NAMESPACE=1
         LIVEFLOW_VERSION=\"${PROJECT_VERSION}\")
 
@@ -110,8 +112,9 @@ function(configure_liveflow_plugin_target target_name)
 
     target_compile_definitions(${target_name}
         PUBLIC
-            JUCE_WEB_BROWSER=0
-            JUCE_USE_CURL=0
+            JUCE_WEB_BROWSER=1
+            JUCE_USE_WIN_WEBVIEW2=1
+            JUCE_USE_CURL=1
             JUCE_VST3_CAN_REPLACE_VST2=0
             DONT_SET_USING_JUCE_NAMESPACE=1
             LIVEFLOW_VERSION_EXT="${LIVEFLOW_VERSION_STRING}")
@@ -126,6 +129,7 @@ juce_add_plugin(LiveFlowBalancer
     NEEDS_MIDI_OUTPUT FALSE
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    NEEDS_WEBVIEW2 TRUE
     COPY_PLUGIN_AFTER_BUILD ${LIVEFLOW_COPY_PLUGIN_AFTER_BUILD}
     PLUGIN_MANUFACTURER_CODE Lflo
     PLUGIN_CODE Lfb1
@@ -141,16 +145,7 @@ target_sources(LiveFlowBalancer
         src/plugin/LiveFlowAudioProcessor.h
         src/plugin/LiveFlowAudioProcessorEditor.cpp
         src/plugin/LiveFlowAudioProcessorEditor.h
-        src/ui/CompactKnob.h
-        src/ui/GainTimelineComponent.h
-        src/ui/LiveFlowLookAndFeel.cpp
-        src/ui/LiveFlowLookAndFeel.h
-        src/ui/PresenceIndicator.h
-        src/ui/HelpOverlay.cpp
-        src/ui/HelpOverlay.h
-        src/ui/Translations.h
-        src/ui/VisualizerComponent.cpp
-        src/ui/VisualizerComponent.h)
+        src/ui/Translations.h)
 
 target_link_libraries(LiveFlowBalancer
     PRIVATE
