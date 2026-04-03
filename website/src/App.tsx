@@ -8,8 +8,9 @@ type Lang = 'en' | 'zh';
 const t: Record<string, Record<Lang, string>> = {
   // Navbar
   'nav.products':     { en: 'Products',         zh: '产品' },
+  'nav.dashboard':    { en: 'My Dashboard',     zh: '我的面板' },
   'nav.licenses':     { en: 'My Licenses',      zh: '我的许可证' },
-  'nav.logout':       { en: 'Logout',           zh: '退出登录' },
+  'nav.logout':       { en: 'Log Out',          zh: '退出登录' },
   'nav.login':        { en: 'Login',            zh: '登录' },
   'nav.signup':       { en: 'Sign Up',          zh: '注册' },
 
@@ -141,11 +142,14 @@ function Navbar() {
       <div className="nav-links">
         <a href="/">{i('nav.products')}</a>
         {user ? (
-          <>
-            <a href="/dashboard">{i('nav.licenses')}</a>
-            <span className="nav-email">{user.email}</span>
-            <button className="btn btn-ghost" onClick={logout}>{i('nav.logout')}</button>
-          </>
+          <div className="nav-user-menu">
+            <span className="nav-email">{user.email} ▾</span>
+            <div className="nav-dropdown">
+              <a href="/dashboard">{i('nav.dashboard')}</a>
+              <a href="/dashboard">{i('nav.licenses')}</a>
+              <button onClick={() => { logout(); window.location.href = '/'; }}>{i('nav.logout')}</button>
+            </div>
+          </div>
         ) : (
           <>
             <a href="/login" className="btn btn-ghost">{i('nav.login')}</a>
@@ -171,7 +175,6 @@ function Footer() {
         <div className="footer-links">
           <a href="https://micro-grav.com" target="_blank" rel="noreferrer">micro-grav.com</a>
           <a href="https://micrograv.net" target="_blank" rel="noreferrer">micrograv.net</a>
-          <a href="https://github.com/zilinwwww/LiveFlow-Balancer-VST" target="_blank" rel="noreferrer">GitHub</a>
         </div>
         <div className="footer-copy">© {new Date().getFullYear()} Micro-Grav Studio. {i('footer.rights')}</div>
       </div>
@@ -209,7 +212,6 @@ function Home() {
               </ul>
               <div className="product-actions">
                 <a href="/register" className="btn btn-primary">{i('home.getLicense')}</a>
-                <a href="https://github.com/zilinwwww/LiveFlow-Balancer-VST" className="btn btn-ghost" target="_blank" rel="noreferrer">GitHub</a>
               </div>
             </div>
           </div>

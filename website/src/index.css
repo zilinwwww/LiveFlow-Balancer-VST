@@ -67,7 +67,60 @@ a:hover { color: var(--accent-hover); }
 }
 .nav-links a { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
 .nav-links a:hover { color: var(--text-main); }
-.nav-email { color: var(--text-dim); font-size: 0.85rem; }
+.nav-email { color: var(--text-muted); font-size: 0.85rem; cursor: pointer; user-select: none; }
+
+/* ── User Dropdown ── */
+.nav-user-menu {
+  position: relative;
+}
+.nav-user-menu .nav-email:hover { color: var(--text-main); }
+.nav-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-sm);
+  min-width: 180px;
+  padding: 6px 0;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  animation: dropIn 0.15s ease;
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.nav-user-menu:hover .nav-dropdown { display: block; }
+.nav-dropdown a,
+.nav-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  text-align: left;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-family: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.1s ease;
+}
+.nav-dropdown a:hover,
+.nav-dropdown button:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+}
+.nav-dropdown button {
+  border-top: 1px solid var(--border);
+  color: var(--error);
+}
+.nav-dropdown button:hover {
+  color: #ff8a8a;
+}
 
 /* ── Buttons ── */
 .btn {
