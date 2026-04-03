@@ -344,6 +344,32 @@ a:hover { color: var(--accent-hover); }
 }
 .dashboard-header h2 { font-size: 1.4rem; }
 
+.redeem-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.redeem-row {
+  display: flex;
+  gap: 10px;
+}
+.redeem-row input {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  outline: none;
+}
+.redeem-row input:focus { border-color: var(--accent); }
+.redeem-row input::placeholder { color: var(--text-dim); font-family: 'Inter', sans-serif; letter-spacing: 0; }
+
 .license-table {
   width: 100%;
   border-collapse: collapse;

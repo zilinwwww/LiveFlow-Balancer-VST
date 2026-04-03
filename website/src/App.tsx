@@ -23,7 +23,10 @@ const t: Record<string, Record<Lang, string>> = {
   'home.f2':          { en: 'Interactive LUFS scatter plot with direct curve manipulation', zh: '交互式 LUFS 散点图，支持直接曲线操控' },
   'home.f3':          { en: 'Configurable dynamics, speed, and range controls', zh: '可配置的动态范围、速度和区间控制' },
   'home.f4':          { en: 'Expert mode with advanced parameters', zh: '专家模式与高级参数' },
-  'home.getLicense':  { en: 'Get Free License',  zh: '免费获取许可证' },
+  'home.getLicense':  { en: 'Get Free License!',  zh: '免费获取许可证！' },
+  'home.regLicense':  { en: 'Register & Get Free License', zh: '注册并获取免费许可证' },
+  'home.claiming':    { en: 'Claiming...', zh: '领取中...' },
+  'home.claimed':     { en: '✅ License Claimed! Check Dashboard', zh: '✅ 已领取！请查看面板' },
   'home.more':        { en: 'More plugins coming soon.', zh: '更多插件即将推出。' },
 
   // Login
@@ -54,11 +57,15 @@ const t: Record<string, Record<Lang, string>> = {
 
   // Dashboard
   'dash.title':       { en: 'My Licenses',      zh: '我的许可证' },
-  'dash.claim':       { en: 'Claim Balancer License', zh: '领取 Balancer 许可证' },
-  'dash.claiming':    { en: 'Claiming...',      zh: '领取中...' },
+  'dash.redeem':      { en: 'Redeem License',   zh: '兑换许可证' },
+  'dash.redeemPlc':   { en: 'Enter license key...', zh: '输入许可证密钥...' },
+  'dash.redeemBtn':   { en: 'Redeem',           zh: '兑换' },
+  'dash.redeeming':   { en: 'Redeeming...',     zh: '兑换中...' },
+  'dash.redeemOk':    { en: '✅ License redeemed!', zh: '✅ 兑换成功！' },
+  'dash.redeemErr':   { en: 'Invalid or already taken key', zh: '无效或已被使用的密钥' },
   'dash.loading':     { en: 'Loading...',       zh: '加载中...' },
   'dash.empty1':      { en: "You don't have any licenses yet.", zh: '你还没有任何许可证。' },
-  'dash.empty2':      { en: 'Click "Claim Balancer License" above to get started — it\'s free!', zh: '点击上方「领取 Balancer 许可证」即可免费开始！' },
+  'dash.empty2':      { en: 'Use the "Redeem License" button to add a license key.', zh: '使用「兑换许可证」按钮来添加许可证密钥。' },
   'dash.product':     { en: 'Product',          zh: '产品' },
   'dash.key':         { en: 'License Key',      zh: '许可证密钥' },
   'dash.status':      { en: 'Status',           zh: '状态' },
@@ -184,7 +191,23 @@ function Footer() {
 
 // ── Home Page ──
 function Home() {
+  const { user } = useAuth();
   const { i } = useLang();
+  const [claimStatus, setClaimStatus] = useState<'idle' | 'loading' | 'done'>('idle');
+
+  const handleClaim = async () => {
+    setClaimStatus('loading');
+    try {
+      const res = await fetch('/api/licenses/claim', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product: 'balancer' }), credentials: 'same-origin',
+      });
+      const data = await res.json();
+      if (data.status === 'ok' || data.code === 'ALREADY_CLAIMED') setClaimStatus('done');
+      else setClaimStatus('idle');
+    } catch { setClaimStatus('idle'); }
+  };
+
   return (
     <div className="page home-page">
       <section className="hero">
@@ -211,7 +234,15 @@ function Home() {
                 <li>{i('home.f4')}</li>
               </ul>
               <div className="product-actions">
-                <a href="/register" className="btn btn-primary">{i('home.getLicense')}</a>
+                {!user ? (
+                  <a href="/register" className="btn btn-primary">{i('home.regLicense')}</a>
+                ) : claimStatus === 'done' ? (
+                  <a href="/dashboard" className="btn btn-primary">{i('home.claimed')}</a>
+                ) : (
+                  <button className="btn btn-primary" onClick={handleClaim} disabled={claimStatus === 'loading'}>
+                    {claimStatus === 'loading' ? i('home.claiming') : i('home.getLicense')}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -321,8 +352,11 @@ function Dashboard() {
   const { i } = useLang();
   const [licenses, setLicenses] = useState<License[]>([]);
   const [loading, setLoading] = useState(true);
-  const [claiming, setClaiming] = useState(false);
   const [unbinding, setUnbinding] = useState<string | null>(null);
+  const [showRedeem, setShowRedeem] = useState(false);
+  const [redeemKey, setRedeemKey] = useState('');
+  const [redeeming, setRedeeming] = useState(false);
+  const [redeemMsg, setRedeemMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
   const fetchLicenses = async () => {
     try {
@@ -335,17 +369,24 @@ function Dashboard() {
 
   useEffect(() => { if (user) fetchLicenses(); }, [user]);
 
-  const claimLicense = async (product: string) => {
-    setClaiming(true);
+  const redeemLicense = async () => {
+    if (!redeemKey.trim()) return;
+    setRedeeming(true); setRedeemMsg(null);
     try {
-      const res = await fetch('/api/licenses/claim', {
+      const res = await fetch('/api/licenses/redeem', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product }), credentials: 'same-origin',
+        body: JSON.stringify({ key: redeemKey.trim() }), credentials: 'same-origin',
       });
       const data = await res.json();
-      if (data.status === 'ok') fetchLicenses();
-    } catch { /* silent */ }
-    setClaiming(false);
+      if (data.status === 'ok') {
+        setRedeemMsg({ type: 'ok', text: i('dash.redeemOk') });
+        setRedeemKey(''); fetchLicenses();
+        setTimeout(() => { setShowRedeem(false); setRedeemMsg(null); }, 2000);
+      } else {
+        setRedeemMsg({ type: 'err', text: i('dash.redeemErr') });
+      }
+    } catch { setRedeemMsg({ type: 'err', text: 'Network error' }); }
+    setRedeeming(false);
   };
 
   const unbindLicense = async (licenseId: string) => {
@@ -363,19 +404,28 @@ function Dashboard() {
   if (authLoading) return <div className="page"><p className="text-muted">{i('dash.loading')}</p></div>;
   if (!user) return <Navigate to="/login" />;
 
-  const hasBalancer = licenses.some(l => l.product === 'balancer');
-
   return (
     <div className="page dashboard-page">
       <div className="dashboard-card">
         <div className="dashboard-header">
           <h2>{i('dash.title')}</h2>
-          {!hasBalancer && (
-            <button className="btn btn-primary" onClick={() => claimLicense('balancer')} disabled={claiming}>
-              {claiming ? i('dash.claiming') : i('dash.claim')}
-            </button>
-          )}
+          <button className="btn btn-primary" onClick={() => setShowRedeem(!showRedeem)}>
+            {i('dash.redeem')}
+          </button>
         </div>
+
+        {showRedeem && (
+          <div className="redeem-section">
+            {redeemMsg && <div className={`alert alert-${redeemMsg.type === 'ok' ? 'success' : 'error'}`}>{redeemMsg.text}</div>}
+            <div className="redeem-row">
+              <input type="text" placeholder={i('dash.redeemPlc')} value={redeemKey}
+                onChange={e => setRedeemKey(e.target.value.toUpperCase())} />
+              <button className="btn btn-primary" onClick={redeemLicense} disabled={redeeming || !redeemKey.trim()}>
+                {redeeming ? i('dash.redeeming') : i('dash.redeemBtn')}
+              </button>
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <p className="text-muted">{i('dash.loading')}</p>
