@@ -21,7 +21,7 @@ export function Login() {
         body: JSON.stringify({ email, password }), credentials: 'same-origin',
       });
       const data = await res.json();
-      if (data.status === 'ok') { refresh(); navigate('/dashboard'); }
+      if (data.status === 'ok') { refresh(); navigate('/'); }
       else setError(data.code === 'INVALID_CREDENTIALS' ? i('login.invalidCred') : data.message || i('login.failed'));
     } catch { setError(i('login.networkErr')); }
     setLoading(false);
