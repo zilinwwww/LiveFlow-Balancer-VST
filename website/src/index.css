@@ -77,9 +77,8 @@ a:hover { color: var(--accent-hover); }
 .nav-dropdown {
   display: none;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 2px);
   right: 0;
-  margin-top: 8px;
   background: var(--bg-card);
   border: 1px solid var(--border-hover);
   border-radius: var(--radius-sm);
@@ -88,6 +87,15 @@ a:hover { color: var(--accent-hover); }
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   z-index: 200;
   animation: dropIn 0.15s ease;
+}
+/* Bridge the gap between trigger and dropdown */
+.nav-user-menu::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 8px;
 }
 @keyframes dropIn {
   from { opacity: 0; transform: translateY(-6px); }
