@@ -132,7 +132,9 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
         juce::AlertWindow::showMessageBoxAsync (
             juce::AlertWindow::InfoIcon,
             i18n::getText ("About_Title", lang),
-            i18n::getText ("About_Desc", lang) + "\n\nVersion: " + juce::String(LIVEFLOW_VERSION_EXT));
+            i18n::getText ("About_Desc", lang) + "\n\nVersion: " + juce::String(LIVEFLOW_VERSION_EXT),
+            juce::String(),   // use default button text "OK"
+            this);            // associatedComponent = this, opens in center of plugin
     };
 
     addAndMakeVisible (langButton);
