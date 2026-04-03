@@ -128,14 +128,14 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
     aboutButton.setButtonText ("About");
     aboutButton.onClick = [this]
     {
-        const auto lang = isChinese ? i18n::Language::Chinese : i18n::Language::English;
-        juce::AlertWindow::showMessageBoxAsync (
-            juce::AlertWindow::InfoIcon,
-            i18n::getText ("About_Title", lang),
-            i18n::getText ("About_Desc", lang) + "\n\nVersion: " + juce::String(LIVEFLOW_VERSION_EXT),
-            juce::String(),   // use default button text "OK"
-            this);            // associatedComponent = this, opens in center of plugin
+        aboutOverlay.setVisible (true);
     };
+
+    addAndMakeVisible (websiteLink);
+    websiteLink.setButtonText ("liveflow.micro-grav.com/balancer");
+    websiteLink.setURL (juce::URL ("https://liveflow.micro-grav.com/balancer"));
+    websiteLink.setColour (juce::HyperlinkButton::textColourId, coreAccent (4).withAlpha (0.7f));
+    websiteLink.setJustificationType (juce::Justification::centred);
 
     addAndMakeVisible (langButton);
     langButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0x10ffffff));
@@ -173,6 +173,10 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
     addChildComponent (helpOverlay);
     helpOverlay.setVisible (false);
     helpOverlay.onClose = [this] { helpOverlay.setVisible (false); };
+
+    addChildComponent (aboutOverlay);
+    aboutOverlay.setVisible (false);
+    aboutOverlay.onClose = [this] { aboutOverlay.setVisible (false); };
 
     // Activation overlay — shown when not licensed
     addChildComponent (activationOverlay);
@@ -257,11 +261,7 @@ void LiveFlowAudioProcessorEditor::paint (juce::Graphics& graphics)
 
     graphics.setColour (juce::Colour (0x88eff5fb));
     graphics.setFont (juce::FontOptions (10.0f, juce::Font::bold));
-    graphics.drawText (juce::String(LIVEFLOW_VERSION_EXT), titleArea.removeFromLeft (85), juce::Justification::centredLeft);
-    graphics.setColour (juce::Colour (0xff9fb0c7));
-    graphics.setFont (juce::FontOptions (9.5f));
-    const auto lang = isChinese ? i18n::Language::Chinese : i18n::Language::English;
-    graphics.drawText (i18n::getText ("Header_Sub", lang), titleArea, juce::Justification::centredLeft);
+    graphics.drawText (juce::String(LIVEFLOW_VERSION_EXT), titleArea.removeFromLeft (140), juce::Justification::centredLeft);
 }
 
 void LiveFlowAudioProcessorEditor::resized()
@@ -279,9 +279,12 @@ void LiveFlowAudioProcessorEditor::resized()
     buttonArea.removeFromLeft (btnGap);
     aboutButton.setBounds (buttonArea.removeFromLeft (btnW));
 
-    titleArea.removeFromRight (20); // Spacing between lang toggle and header buttons
-    auto langArea = titleArea.removeFromRight (60).reduced (0, 4);
+    titleArea.removeFromRight (20); // Spacing
+    auto langArea = titleArea.removeFromRight (40).reduced (0, 4);
     langButton.setBounds (langArea);
+    
+    // Website link centered in remaining title area
+    websiteLink.setBounds (titleArea);
 
     // Calculate fixed height needed below the canvas (Removed expertButton bottom row)
     int fixedBottomHeight = 6 + 52 + 6 + 72; // Margins + middleStrip + coreKnobs
@@ -381,6 +384,7 @@ void LiveFlowAudioProcessorEditor::updateAllTexts()
     presenceReleaseKnob.setLabel (i18n::getText ("Label_ReleaseHyst", lang));
     
     helpOverlay.updateLanguage (isChinese);
+    aboutOverlay.updateLanguage (isChinese);
     repaint();
 }
 

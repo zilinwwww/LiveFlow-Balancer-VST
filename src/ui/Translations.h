@@ -53,8 +53,7 @@ inline juce::String getText (const juce::String& key, Language lang)
         { "Label_LookAhead", "Look Ahead" },
         { "Label_ReleaseHyst", "Release Hyst" },
 
-        { "Header_Title", "LIVEFLOW USER MANUAL" },
-        { "Header_Sub", "Adaptive vocal-aware backing rider" }
+        { "Header_Title", "LIVEFLOW USER MANUAL" }
     };
 
     static const std::map<juce::String, juce::String> dictZH = {
@@ -81,8 +80,7 @@ inline juce::String getText (const juce::String& key, Language lang)
         { "Label_LookAhead", ZH("预读取") },
         { "Label_ReleaseHyst", ZH("脱扣延迟") },
 
-        { "Header_Title", ZH("LIVEFLOW 帮助手册") },
-        { "Header_Sub", ZH("智能人声避让骑推子器") }
+        { "Header_Title", ZH("LIVEFLOW 帮助手册") }
     };
 
     const auto& activeDict = (lang == Language::Chinese) ? dictZH : dictEN;

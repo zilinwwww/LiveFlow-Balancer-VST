@@ -153,6 +153,8 @@ target_sources(LiveFlowBalancer
         src/ui/PresenceIndicator.h
         src/ui/HelpOverlay.cpp
         src/ui/HelpOverlay.h
+        src/ui/AboutOverlay.cpp
+        src/ui/AboutOverlay.h
         src/ui/Translations.h
         src/ui/VisualizerComponent.cpp
         src/ui/VisualizerComponent.h)

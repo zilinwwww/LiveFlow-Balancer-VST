@@ -12,6 +12,7 @@
 #include "ui/Translations.h"
 #include "ui/VisualizerComponent.h"
 #include "ui/ActivationOverlay.h"
+#include "ui/AboutOverlay.h"
 
 namespace liveflow
 {
@@ -79,6 +80,7 @@ private:
     CompactKnob anchorKnob;
 
     // Header buttons
+    juce::HyperlinkButton websiteLink;
     juce::TextButton expertButton;
     juce::TextButton helpButton;
     juce::TextButton aboutButton;
@@ -110,6 +112,7 @@ private:
     
     // Overlays must be last to render top-most!
     HelpOverlay helpOverlay;
+    AboutOverlay aboutOverlay;
     
     // Licensing
     LicenseManager licenseManager;
