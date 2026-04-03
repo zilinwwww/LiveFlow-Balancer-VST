@@ -71,6 +71,46 @@ export function Home() {
         </div>
         <p className="coming-soon">{i('home.more')}</p>
       </section>
+
+      <section className="testimonials">
+        <h2 className="section-title">{i('home.reviews')}</h2>
+        <div className="review-grid">
+          <div className="review-card">
+            <p className="review-text">{i('rev1.text')}</p>
+            <p className="review-author">{i('rev1.author')}</p>
+          </div>
+          <div className="review-card">
+            <p className="review-text">{i('rev2.text')}</p>
+            <p className="review-author">{i('rev2.author')}</p>
+          </div>
+          <div className="review-card">
+            <p className="review-text">{i('rev3.text')}</p>
+            <p className="review-author">{i('rev3.author')}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-us">
+        <h2 className="section-title">{i('home.team')}</h2>
+        <p className="team-desc">{i('team.desc')}</p>
+        <div className="team-grid">
+          <div className="team-card">
+            <div className="team-avatar">Z</div>
+            <h4>{i('team1.name')}</h4>
+            <p>{i('team1.role')}</p>
+          </div>
+          <div className="team-card">
+            <div className="team-avatar">A</div>
+            <h4>{i('team2.name')}</h4>
+            <p>{i('team2.role')}</p>
+          </div>
+          <div className="team-card">
+            <div className="team-avatar">B</div>
+            <h4>{i('team3.name')}</h4>
+            <p>{i('team3.role')}</p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

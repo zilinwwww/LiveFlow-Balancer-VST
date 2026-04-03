@@ -263,6 +263,90 @@ a:hover { color: var(--accent-hover); }
   font-style: italic;
 }
 
+/* ── Testimonials ── */
+.testimonials {
+  padding: 60px 0;
+}
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+.review-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 24px;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.review-text {
+  font-style: italic;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  color: var(--text-main);
+}
+.review-author {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: right;
+}
+
+/* ── Team ── */
+.about-us {
+  padding: 60px 0;
+  text-align: center;
+}
+.team-desc {
+  max-width: 600px;
+  margin: 0 auto 40px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.team-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 30px 20px;
+  transition: transform 0.2s;
+}
+.team-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent);
+}
+.team-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--bg-main);
+  border: 2px solid var(--border);
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+.team-card h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+}
+.team-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 /* ── Auth Pages ── */
 .auth-page {
   display: flex;

@@ -25,6 +25,25 @@ const t: Record<string, Record<Lang, string>> = {
   'home.claiming':    { en: 'Claiming...', zh: '领取中...' },
   'home.claimed':     { en: '✅ License Claimed! Check Dashboard', zh: '✅ 已领取！请查看面板' },
   'home.more':        { en: 'More plugins coming soon.', zh: '更多插件即将推出。' },
+  
+  // Testimonials
+  'home.reviews':     { en: 'What Producers Say', zh: '制作人评价' },
+  'rev1.text':        { en: '"Finally, a sidechain alternative that sounds completely natural. It has saved me hours of manual volume automation on my vocal tracks."', zh: '“终于有了一个听起来完全自然的侧链替代方案。它为我节省了数小时的人声轨道全手动音量自动化的时间。”' },
+  'rev1.author':      { en: 'Alex M. - Mixing Engineer', zh: 'Alex M. - 混音工程师' },
+  'rev2.text':        { en: '"The interactive LUFS scatter plot is a game-changer. I can visually set the exact dynamic range I want. Stunning UI!"', zh: '“交互式的 LUFS 散点图绝对是个颠覆性的设计，能够让我可视化地精准设置动态范围，界面惊艳！”' },
+  'rev2.author':      { en: 'Sarah K. - Electronic Producer', zh: 'Sarah K. - 电子音乐制作人' },
+  'rev3.text':        { en: '"It effortlessly tucks the backing track under the vocals without that obvious pumping effect. Essential in my template."', zh: '“它能毫不费力地把伴奏完美垫在人声下面，且没有明显的抽吸感。现在是我工程模板里的必备插件。”' },
+  'rev3.author':      { en: 'David R. - Pop Composer', zh: 'David R. - 流行作曲家' },
+
+  // Team
+  'home.team':        { en: 'Meet Our Team',    zh: '关于我们团队' },
+  'team.desc':        { en: 'We are a small team of passionate audio developers and creatives dedicated to building next-generation workflow tools for modern music production.', zh: '我们是一支由充满热情的音频开发者和创作者组成的小团队，致力于为现代音乐制作打造下一代工作流工具。' },
+  'team1.name':       { en: 'Zilin',            zh: 'Zilin' },
+  'team1.role':       { en: 'Founder & Lead DSP Developer', zh: '创始人、主音频算法开发' },
+  'team2.name':       { en: 'Partner A',        zh: '小伙伴 A' },
+  'team2.role':       { en: 'UX/UI Design & Testing', zh: 'UX/UI 设计与功能测试' },
+  'team3.name':       { en: 'Partner B',        zh: '小伙伴 B' },
+  'team3.role':       { en: 'Audio Engineering & Presets', zh: '音频工程与预设设计' },
 
   // Login
   'login.title':      { en: 'Login',            zh: '登录' },
