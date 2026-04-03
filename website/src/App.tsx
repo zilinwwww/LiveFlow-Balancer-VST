@@ -82,6 +82,8 @@ const t: Record<string, Record<Lang, string>> = {
 };
 
 function detectLang(): Lang {
+  const saved = localStorage.getItem('liveflow_lang');
+  if (saved === 'en' || saved === 'zh') return saved;
   const nav = navigator.language || '';
   return nav.startsWith('zh') ? 'zh' : 'en';
 }
@@ -92,7 +94,11 @@ const LangContext = createContext<LangCtx>({ lang: 'en', setLang: () => {}, i: (
 const useLang = () => useContext(LangContext);
 
 function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState<Lang>(detectLang);
+  const [lang, setLangState] = useState<Lang>(detectLang);
+  const setLang = useCallback((l: Lang) => {
+    localStorage.setItem('liveflow_lang', l);
+    setLangState(l);
+  }, []);
   const i = useCallback((key: string) => t[key]?.[lang] ?? key, [lang]);
   return <LangContext.Provider value={{ lang, setLang, i }}>{children}</LangContext.Provider>;
 }
