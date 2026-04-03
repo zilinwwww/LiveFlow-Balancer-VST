@@ -317,7 +317,7 @@ interface License {
 }
 
 function Dashboard() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { i } = useLang();
   const [licenses, setLicenses] = useState<License[]>([]);
   const [loading, setLoading] = useState(true);
@@ -360,6 +360,7 @@ function Dashboard() {
     setUnbinding(null);
   };
 
+  if (authLoading) return <div className="page"><p className="text-muted">{i('dash.loading')}</p></div>;
   if (!user) return <Navigate to="/login" />;
 
   const hasBalancer = licenses.some(l => l.product === 'balancer');
