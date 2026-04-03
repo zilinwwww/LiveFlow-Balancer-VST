@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 
-export interface User { id: string; email: string; }
+export interface User { id: string; email: string; name?: string; created_at?: string; }
 export interface AuthCtx {
   user: User | null;
   loading: boolean;

@@ -552,6 +552,60 @@ a:hover { color: var(--accent-hover); }
   font-size: 0.8rem;
 }
 
+/* ── Dashboard Tabs & Settings ── */
+.dashboard-tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  margin-bottom: -1px; /* overlap border */
+}
+.tab-btn:hover {
+  color: var(--text-main);
+}
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab-content {
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.settings-content {
+  max-width: 600px;
+}
+.settings-section {
+  margin-bottom: 40px;
+}
+.settings-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: var(--text-main);
+}
+.settings-form .btn {
+  margin-top: 10px;
+}
+.settings-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 40px 0;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .hero h1 { font-size: 2.2rem; }

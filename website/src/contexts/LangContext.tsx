@@ -92,6 +92,23 @@ const t: Record<string, Record<Lang, string>> = {
   'dash.revoked':     { en: '❌ Revoked',        zh: '❌ 已撤销' },
   'dash.unbind':      { en: 'Unbind',           zh: '解绑' },
   'dash.unbinding':   { en: 'Unbinding...',     zh: '解绑中...' },
+  
+  // Dashboard Settings
+  'dash.tabLicenses': { en: 'My Licenses',      zh: '许可证' },
+  'dash.tabSettings': { en: 'Settings',         zh: '个人设置' },
+  'dash.profile':     { en: 'Profile',          zh: '个人资料' },
+  'dash.dispName':    { en: 'Display Name',     zh: '显示姓名' },
+  'dash.email':       { en: 'Email (read only)',zh: '邮箱地址 (只读)' },
+  'dash.save':        { en: 'Save Changes',     zh: '保存修改' },
+  'dash.saving':      { en: 'Saving...',        zh: '保存中...' },
+  'dash.saveOk':      { en: 'Profile updated!', zh: '资料已更新！' },
+  'dash.pwdTitle':    { en: 'Change Password',  zh: '修改密码' },
+  'dash.oldPwd':      { en: 'Current Password', zh: '当前密码' },
+  'dash.newPwd':      { en: 'New Password',     zh: '新密码' },
+  'dash.updatePwd':   { en: 'Update Password',  zh: '更新密码' },
+  'dash.updating':    { en: 'Updating...',      zh: '更新中...' },
+  'dash.pwdOk':       { en: 'Password updated!', zh: '密码更新成功！' },
+  'dash.pwdErr':      { en: 'Incorrect old password or invalid input', zh: '原密码错误或输入不合法' },
 
   // Footer
   'footer.rights':    { en: 'All rights reserved.', zh: '保留所有权利。' },
