@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLang } from '../contexts/LangContext';
@@ -9,6 +9,16 @@ export function Home() {
   const location = useLocation();
   const [claimStatus, setClaimStatus] = useState<'idle' | 'loading' | 'done'>('idle');
   const [isHighlighting, setIsHighlighting] = useState(false);
+
+  const reviewsRef = useRef<HTMLDivElement>(null);
+  const teamRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (ref: React.RefObject<HTMLDivElement | null>, dir: 'left' | 'right') => {
+    if (ref.current) {
+      const scrollAmount = ref.current.clientWidth * 0.8;
+      ref.current.scrollBy({ left: dir === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     if (location.state?.highlightClaim) {
@@ -74,41 +84,51 @@ export function Home() {
 
       <section className="testimonials">
         <h2 className="section-title">{i('home.reviews')}</h2>
-        <div className="review-grid">
-          <div className="review-card">
-            <p className="review-text">{i('rev1.text')}</p>
-            <p className="review-author">{i('rev1.author')}</p>
+        <div className="carousel-wrapper">
+          <button className="carousel-btn prev" onClick={() => scroll(reviewsRef, 'left')}>‹</button>
+          <div className="carousel-track" ref={reviewsRef}>
+            <div className="review-card">
+              <p className="review-text">{i('rev1.text')}</p>
+              <p className="review-author">{i('rev1.author')}</p>
+            </div>
+            <div className="review-card">
+              <p className="review-text">{i('rev2.text')}</p>
+              <p className="review-author">{i('rev2.author')}</p>
+            </div>
+            <div className="review-card">
+              <p className="review-text">{i('rev3.text')}</p>
+              <p className="review-author">{i('rev3.author')}</p>
+            </div>
+            {/* You can copy and paste more .review-card elements here and they will slide naturally */}
           </div>
-          <div className="review-card">
-            <p className="review-text">{i('rev2.text')}</p>
-            <p className="review-author">{i('rev2.author')}</p>
-          </div>
-          <div className="review-card">
-            <p className="review-text">{i('rev3.text')}</p>
-            <p className="review-author">{i('rev3.author')}</p>
-          </div>
+          <button className="carousel-btn next" onClick={() => scroll(reviewsRef, 'right')}>›</button>
         </div>
       </section>
 
       <section className="about-us">
         <h2 className="section-title">{i('home.team')}</h2>
         <p className="team-desc">{i('team.desc')}</p>
-        <div className="team-grid">
-          <div className="team-card">
-            <div className="team-avatar">Z</div>
-            <h4>{i('team1.name')}</h4>
-            <p>{i('team1.role')}</p>
+        <div className="carousel-wrapper" style={{ maxWidth: '900px' }}>
+          <button className="carousel-btn prev" onClick={() => scroll(teamRef, 'left')}>‹</button>
+          <div className="carousel-track" ref={teamRef}>
+            <div className="team-card">
+              <div className="team-avatar">Z</div>
+              <h4>{i('team1.name')}</h4>
+              <p>{i('team1.role')}</p>
+            </div>
+            <div className="team-card">
+              <div className="team-avatar">A</div>
+              <h4>{i('team2.name')}</h4>
+              <p>{i('team2.role')}</p>
+            </div>
+            <div className="team-card">
+              <div className="team-avatar">B</div>
+              <h4>{i('team3.name')}</h4>
+              <p>{i('team3.role')}</p>
+            </div>
+            {/* Same here, add more .team-card elements to let them slide */}
           </div>
-          <div className="team-card">
-            <div className="team-avatar">A</div>
-            <h4>{i('team2.name')}</h4>
-            <p>{i('team2.role')}</p>
-          </div>
-          <div className="team-card">
-            <div className="team-avatar">B</div>
-            <h4>{i('team3.name')}</h4>
-            <p>{i('team3.role')}</p>
-          </div>
+          <button className="carousel-btn next" onClick={() => scroll(teamRef, 'right')}>›</button>
         </div>
       </section>
     </div>

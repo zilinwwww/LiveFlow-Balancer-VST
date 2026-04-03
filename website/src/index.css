@@ -263,14 +263,66 @@ a:hover { color: var(--accent-hover); }
   font-style: italic;
 }
 
+/* ── Carousels ── */
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  gap: 24px;
+  padding: 15px 5px; /* room for box-shadow on hover */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  flex: 1;
+}
+.carousel-track::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+.carousel-track > * {
+  flex: 0 0 auto;
+  width: 300px;
+  scroll-snap-align: center;
+}
+.carousel-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 2;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.2s;
+}
+.carousel-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.carousel-btn.prev {
+  left: -20px;
+}
+.carousel-btn.next {
+  right: -20px;
+}
+
 /* ── Testimonials ── */
 .testimonials {
   padding: 60px 0;
-}
-.review-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
 }
 .review-card {
   background: var(--bg-card);
@@ -304,13 +356,6 @@ a:hover { color: var(--accent-hover); }
   margin: 0 auto 40px;
   color: var(--text-muted);
   line-height: 1.6;
-}
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 30px;
-  max-width: 900px;
-  margin: 0 auto;
 }
 .team-card {
   background: var(--bg-card);
@@ -489,6 +534,51 @@ a:hover { color: var(--accent-hover); }
   font-size: 0.85rem;
   color: var(--accent);
   letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.license-key:hover {
+  opacity: 0.8;
+}
+.copy-icon {
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.license-key:hover .copy-icon {
+  color: var(--accent);
+}
+.copy-tooltip {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-main);
+  color: var(--bg-main);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  animation: fadeIn 0.2s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.copy-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--text-main);
 }
 .machine-id {
   font-family: monospace;

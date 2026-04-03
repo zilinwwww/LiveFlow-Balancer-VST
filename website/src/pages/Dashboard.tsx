@@ -22,6 +22,8 @@ export function Dashboard() {
   const [redeemKey, setRedeemKey] = useState('');
   const [redeeming, setRedeeming] = useState(false);
   const [redeemMsg, setRedeemMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+  
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   // Settings State
   const [name, setName] = useState(user?.name || '');
@@ -78,6 +80,14 @@ export function Dashboard() {
       fetchLicenses();
     } catch { /* silent */ }
     setUnbinding(null);
+  };
+
+  const handleCopy = (key: string) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(key);
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey(null), 2000);
+    }
   };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -187,7 +197,17 @@ export function Dashboard() {
                       <td className="product-name">
                         {lic.product === 'balancer' ? 'LiveFlow Balancer' : lic.product}
                       </td>
-                      <td className="license-key">{lic.key}</td>
+                      <td className="license-key" onClick={() => handleCopy(lic.key)} title="Click to copy">
+                        {lic.key}
+                        <span className="copy-icon">
+                          {copiedKey === lic.key ? (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                          ) : (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                          )}
+                        </span>
+                        {copiedKey === lic.key && <span className="copy-tooltip">Copied!</span>}
+                      </td>
                       <td>
                         <span className={`status-badge status-${lic.status}`}>
                           {lic.status === 'bound' ? i('dash.active') : lic.status === 'available' ? i('dash.available') : i('dash.revoked')}
