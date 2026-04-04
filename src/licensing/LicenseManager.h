@@ -40,13 +40,14 @@ public:
         args.add("powershell");
         args.add("-NoProfile");
         args.add("-Command");
-        args.add("$gpu=(Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name) -join ', ';"
+        args.add("$cpu=(Get-CimInstance Win32_Processor | Select-Object -ExpandProperty Name) -join ', ';"
+                 "$gpu=(Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name) -join ', ';"
                  "$snd=(Get-CimInstance Win32_SoundDevice | Select-Object -ExpandProperty Name) -join ', ';"
                  "$kbd=(Get-CimInstance Win32_Keyboard | Select-Object -ExpandProperty Description) -join ', ';"
                  "$mse=(Get-CimInstance Win32_PointingDevice | Select-Object -ExpandProperty Description) -join ', ';"
                  "$mobo=(Get-CimInstance Win32_BaseBoard | Select-Object -ExpandProperty Product) -join ', ';"
                  "$mon=(Get-CimInstance Win32_DesktopMonitor | Select-Object -ExpandProperty Name) -join ', ';"
-                 "@{GPU=$gpu;Sound=$snd;Keyboard=$kbd;Mouse=$mse;Motherboard=$mobo;Monitor=$mon} | ConvertTo-Json -Compress");
+                 "@{CPU=$cpu;GPU=$gpu;Sound=$snd;Keyboard=$kbd;Mouse=$mse;Motherboard=$mobo;Monitor=$mon} | ConvertTo-Json -Compress");
         
         if (process.start(args, juce::ChildProcess::wantStdOut | juce::ChildProcess::wantStdErr))
         {
@@ -65,12 +66,15 @@ public:
     {
         juce::DynamicObject::Ptr info = new juce::DynamicObject();
         info->setProperty("os", juce::SystemStats::getOperatingSystemName());
-        info->setProperty("cpu", juce::SystemStats::getCpuVendor() + " " + juce::String(juce::SystemStats::getCpuSpeedInMegahertz()) + "MHz (" + juce::String(juce::SystemStats::getNumCpus()) + " cores)");
+        // Will rely on WMI CPU instead for more detailed model name
         info->setProperty("ram", juce::String(juce::SystemStats::getMemorySizeInMegabytes()) + "MB");
         info->setProperty("hostname", juce::SystemStats::getComputerName());
         
         juce::var hwVar = juce::JSON::parse(getHardwareViaPowershell());
         if (auto* hwObj = hwVar.getDynamicObject()) {
+            // Append CPU Core info alongside WMI name
+            juce::String cpuName = hwObj->getProperty("CPU").toString();
+            info->setProperty("cpu", cpuName.isNotEmpty() ? cpuName + " (" + juce::String(juce::SystemStats::getNumCpus()) + " cores)" : "Unknown CPU");
             info->setProperty("gpu", hwObj->getProperty("GPU"));
             info->setProperty("sound", hwObj->getProperty("Sound"));
             info->setProperty("keyboard", hwObj->getProperty("Keyboard"));
