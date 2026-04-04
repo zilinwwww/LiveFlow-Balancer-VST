@@ -63,7 +63,7 @@ export function Home() {
                 <li>{i('home.f4')}</li>
               </ul>
               <div className="product-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <a href="#" target="_blank" rel="noreferrer" className="btn btn-secondary">
+                <a href="https://download.micro-grav.com/LiveFlow%20Balancer-v1.0.0-rc1-win64.exe" target="_blank" rel="noreferrer" className="btn btn-secondary">
                   {i('home.downloadWin')}
                 </a>
                 {!user ? (
