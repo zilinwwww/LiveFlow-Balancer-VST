@@ -44,7 +44,9 @@ public:
                  "$snd=(Get-CimInstance Win32_SoundDevice | Select-Object -ExpandProperty Name) -join ', ';"
                  "$kbd=(Get-CimInstance Win32_Keyboard | Select-Object -ExpandProperty Description) -join ', ';"
                  "$mse=(Get-CimInstance Win32_PointingDevice | Select-Object -ExpandProperty Description) -join ', ';"
-                 "@{GPU=$gpu;Sound=$snd;Keyboard=$kbd;Mouse=$mse} | ConvertTo-Json -Compress");
+                 "$mobo=(Get-CimInstance Win32_BaseBoard | Select-Object -ExpandProperty Product) -join ', ';"
+                 "$mon=(Get-CimInstance Win32_DesktopMonitor | Select-Object -ExpandProperty Name) -join ', ';"
+                 "@{GPU=$gpu;Sound=$snd;Keyboard=$kbd;Mouse=$mse;Motherboard=$mobo;Monitor=$mon} | ConvertTo-Json -Compress");
         
         if (process.start(args, juce::ChildProcess::wantStdOut | juce::ChildProcess::wantStdErr))
         {
@@ -73,6 +75,8 @@ public:
             info->setProperty("sound", hwObj->getProperty("Sound"));
             info->setProperty("keyboard", hwObj->getProperty("Keyboard"));
             info->setProperty("mouse", hwObj->getProperty("Mouse"));
+            info->setProperty("motherboard", hwObj->getProperty("Motherboard"));
+            info->setProperty("monitor", hwObj->getProperty("Monitor"));
         }
 
         juce::DynamicObject::Ptr root = new juce::DynamicObject();
