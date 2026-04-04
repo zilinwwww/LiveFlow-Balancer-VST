@@ -254,7 +254,8 @@ void LiveFlowAudioProcessorEditor::timerCallback()
                         {
                             if (safeThis != nullptr)
                             {
-                                safeThis->updateLink.setButtonText (newestVer + " Available!");
+                                safeThis->availableUpdateVersion = newestVer;
+                                safeThis->updateAllTexts();
                                 safeThis->updateLink.setURL (juce::URL (linkUrl));
                                 safeThis->updateLink.setVisible (true);
                                 safeThis->resized();
@@ -436,6 +437,12 @@ void LiveFlowAudioProcessorEditor::updateAllTexts()
     lookAheadKnob.setLabel (i18n::getText ("Label_LookAhead", lang));
     presenceReleaseKnob.setLabel (i18n::getText ("Label_ReleaseHyst", lang));
     
+    if (availableUpdateVersion.isNotEmpty())
+    {
+        const auto updateText = isChinese ? (ZH("发现新版本 ") + availableUpdateVersion) : (availableUpdateVersion + " Available!");
+        updateLink.setButtonText (updateText);
+    }
+
     helpOverlay.updateLanguage (isChinese);
     aboutOverlay.updateLanguage (isChinese);
     repaint();

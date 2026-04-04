@@ -82,6 +82,7 @@ private:
     // Header buttons
     juce::HyperlinkButton websiteLink;
     juce::HyperlinkButton updateLink;
+    juce::String availableUpdateVersion;
     bool updateCheckTriggered = false;
 
     juce::TextButton expertButton;
