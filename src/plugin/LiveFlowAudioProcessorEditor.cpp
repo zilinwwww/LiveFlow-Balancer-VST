@@ -324,8 +324,11 @@ void LiveFlowAudioProcessorEditor::resized()
     langButton.setBounds (langArea);
     
     // Website link centered tightly
-    const int webW = 60;
-    const int upW = updateLink.isVisible() ? 100 : 0;
+    const int webW = 65;
+    int upW = 0;
+    if (updateLink.isVisible())
+        upW = juce::Font(juce::FontOptions(12.0f, juce::Font::bold)).getStringWidth(updateLink.getButtonText()) + 12;
+
     auto centerArea = titleArea.withSizeKeepingCentre (webW + 8 + upW, titleArea.getHeight());
     
     websiteLink.setBounds (centerArea.removeFromLeft (webW));
