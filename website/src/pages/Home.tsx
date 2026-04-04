@@ -20,8 +20,23 @@ export function Home() {
     }
   };
 
+  const [downloadUrl, setDownloadUrl] = useState("https://download.micro-grav.com/LiveFlow%20Balancer-v1.0.0-rc1-win64.exe");
+  const [downloadVersion, setDownloadVersion] = useState("v1.0.0-rc1");
+
+  useEffect(() => {
+    fetch('https://download.micro-grav.com/latest.json?' + new Date().getTime())
+      .then(res => res.json())
+      .then((data: { version: string; file_url: string }) => {
+        if (data.version && data.file_url) {
+          setDownloadVersion(data.version);
+          setDownloadUrl(data.file_url);
+        }
+      })
+      .catch(e => console.warn('Could not fetch latest release:', e));
+  }, []);
+
   const handleDownload = () => {
-    window.location.href = "https://download.micro-grav.com/LiveFlow%20Balancer-v1.0.0-rc1-win64.exe";
+    window.location.href = downloadUrl;
   };
 
   useEffect(() => {
@@ -68,7 +83,7 @@ export function Home() {
               </ul>
               <div className="product-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <button onClick={handleDownload} className="btn btn-secondary">
-                  {i('home.downloadWin')}
+                  {i('home.downloadWin')} ({downloadVersion})
                 </button>
                 {!user ? (
                   <Link to="/register" className="btn btn-primary">{i('home.regLicense')}</Link>
