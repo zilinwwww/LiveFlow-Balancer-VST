@@ -105,6 +105,7 @@ export function Home() {
         </div>
       </section>
 
+      {false && (
       <section className="about-us">
         <h2 className="section-title">{i('home.team')}</h2>
         <p className="team-desc">{i('team.desc')}</p>
@@ -131,6 +132,7 @@ export function Home() {
           <button className="carousel-btn next" onClick={() => scroll(teamRef, 'right')}>›</button>
         </div>
       </section>
+      )}
     </div>
   );
 }
