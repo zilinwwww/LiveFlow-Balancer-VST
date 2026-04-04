@@ -33,6 +33,27 @@ public:
     juce::String getMachineId() const noexcept { return machineId; }
     juce::String getStatusMessage() const noexcept { return statusMessage; }
 
+    static juce::String getHardwareViaPowershell()
+    {
+        juce::ChildProcess process;
+        juce::StringArray args;
+        args.add("powershell");
+        args.add("-NoProfile");
+        args.add("-Command");
+        args.add("$gpu=(Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name) -join ', ';"
+                 "$snd=(Get-CimInstance Win32_SoundDevice | Select-Object -ExpandProperty Name) -join ', ';"
+                 "$kbd=(Get-CimInstance Win32_Keyboard | Select-Object -ExpandProperty Description) -join ', ';"
+                 "$mse=(Get-CimInstance Win32_PointingDevice | Select-Object -ExpandProperty Description) -join ', ';"
+                 "@{GPU=$gpu;Sound=$snd;Keyboard=$kbd;Mouse=$mse} | ConvertTo-Json -Compress");
+        
+        if (process.start(args, juce::ChildProcess::wantStdOut | juce::ChildProcess::wantStdErr))
+        {
+            juce::String output = process.readAllProcessOutput();
+            return output.trim();
+        }
+        return "{}";
+    }
+
     /**
      * Attempt to activate with a license key.
      * Makes a synchronous HTTP call to the server.
@@ -40,7 +61,27 @@ public:
      */
     bool activate (const juce::String& key)
     {
-        auto jsonBody = juce::String ("{\"key\":\"") + key + "\",\"machineId\":\"" + machineId + "\"}";
+        juce::DynamicObject::Ptr info = new juce::DynamicObject();
+        info->setProperty("os", juce::SystemStats::getOperatingSystemName());
+        info->setProperty("cpu", juce::SystemStats::getCpuVendor() + " " + juce::String(juce::SystemStats::getCpuSpeedInMegahertz()) + "MHz (" + juce::String(juce::SystemStats::getNumCpus()) + " cores)");
+        info->setProperty("ram", juce::String(juce::SystemStats::getMemorySizeInMegabytes()) + "MB");
+        info->setProperty("hostname", juce::SystemStats::getComputerName());
+        
+        juce::var hwVar = juce::JSON::parse(getHardwareViaPowershell());
+        if (auto* hwObj = hwVar.getDynamicObject()) {
+            info->setProperty("gpu", hwObj->getProperty("GPU"));
+            info->setProperty("sound", hwObj->getProperty("Sound"));
+            info->setProperty("keyboard", hwObj->getProperty("Keyboard"));
+            info->setProperty("mouse", hwObj->getProperty("Mouse"));
+        }
+
+        juce::DynamicObject::Ptr root = new juce::DynamicObject();
+        root->setProperty("key", key);
+        root->setProperty("machineId", machineId);
+        root->setProperty("machineName", juce::SystemStats::getComputerName());
+        root->setProperty("machineInfo", juce::JSON::toString(juce::var(info.get())));
+
+        juce::String jsonBody = juce::JSON::toString(juce::var(root.get()));
 
         juce::URL url (kActivationUrl);
         auto stream = url.withPOSTData (jsonBody)

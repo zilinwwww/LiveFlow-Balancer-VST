@@ -6,7 +6,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     if (!user) return json({ status: 'error', code: 'UNAUTHORIZED' }, 401);
 
     const { results } = await context.env.DB.prepare(
-      'SELECT id, product, key, status, machine_id, bound_at, created_at FROM licenses WHERE user_id = ? ORDER BY created_at DESC'
+      'SELECT id, product, key, status, machine_id, machine_name, machine_info, bound_at, created_at FROM licenses WHERE user_id = ? ORDER BY created_at DESC'
     ).bind(user.id).all();
 
     return json({ status: 'ok', licenses: results });

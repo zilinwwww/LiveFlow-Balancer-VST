@@ -1,10 +1,15 @@
 import { json, type Env } from '../_utils';
 
-interface ActivateRequest { key: string; machineId: string; }
+interface ActivateRequest { 
+  key: string; 
+  machineId: string;
+  machineName?: string;
+  machineInfo?: string;
+}
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
-    const { key, machineId } = await context.request.json<ActivateRequest>();
+    const { key, machineId, machineName = null, machineInfo = null } = await context.request.json<ActivateRequest>();
     if (!key || !machineId) return json({ status: 'error', code: 'MISSING_FIELDS' }, 400);
 
     const license = await context.env.DB.prepare(
@@ -23,8 +28,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     // status === 'available' → bind it
     await context.env.DB.prepare(
-      "UPDATE licenses SET status = 'bound', machine_id = ?, bound_at = datetime('now') WHERE id = ?"
-    ).bind(machineId, license.id).run();
+      "UPDATE licenses SET status = 'bound', machine_id = ?, machine_name = ?, machine_info = ?, bound_at = datetime('now') WHERE id = ?"
+    ).bind(machineId, machineName, machineInfo, license.id).run();
 
     return json({ status: 'ok', message: 'Activated successfully' });
   } catch (e: any) {

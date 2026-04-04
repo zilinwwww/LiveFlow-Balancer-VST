@@ -745,3 +745,7 @@ a:hover { color: var(--accent-hover); }
   .dashboard-header { flex-direction: column; gap: 12px; }
   .license-table { font-size: 0.8rem; }
 }
+
+ . t o o l t i p - c o n t a i n e r : h o v e r   . t o o l t i p - c o n t e n t   {   d i s p l a y :   b l o c k   ! i m p o r t a n t ;   } 
+  
+ 
