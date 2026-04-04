@@ -19,6 +19,10 @@ class LicenseManager
 public:
     static constexpr const char* kActivationUrl = "https://liveflow.micro-grav.com/api/plugin/activate";
     static constexpr const char* kValidateUrl   = "https://liveflow.micro-grav.com/api/plugin/validate";
+
+    // Fallback URLs for domestic users (e.g. AliCloud, Tencent Cloud, or Vercel CNAME)
+    static constexpr const char* kActivationUrlFallback = "https://liveflow-fallback.micro-grav.com/api/plugin/activate";
+    static constexpr const char* kValidateUrlFallback   = "https://liveflow-fallback.micro-grav.com/api/plugin/validate";
     static constexpr int kOfflineGraceDays = 3;
 
     LicenseManager()
@@ -92,10 +96,19 @@ public:
         juce::String jsonBody = juce::JSON::toString(juce::var(root.get()));
 
         juce::URL url (kActivationUrl);
-        auto stream = url.withPOSTData (jsonBody)
-                         .createInputStream (juce::URL::InputStreamOptions (juce::URL::ParameterHandling::inAddress)
-                                                .withExtraHeaders ("Content-Type: application/json")
-                                                .withConnectionTimeoutMs (8000));
+        auto options = juce::URL::InputStreamOptions (juce::URL::ParameterHandling::inAddress)
+                           .withExtraHeaders ("Content-Type: application/json\r\nUser-Agent: LiveFlow-Plugin/1.0")
+                           .withConnectionTimeoutMs (15000)
+                           .withNumRedirectsToFollow (3);
+
+        auto stream = url.withPOSTData (jsonBody).createInputStream (options);
+
+        if (stream == nullptr)
+        {
+            // Try fallback URL if primary fails
+            juce::URL fallbackUrl (kActivationUrlFallback);
+            stream = fallbackUrl.withPOSTData (jsonBody).createInputStream (options);
+        }
 
         if (stream == nullptr)
         {
@@ -136,10 +149,19 @@ public:
         auto jsonBody = juce::String ("{\"key\":\"") + licenseKey + "\",\"machineId\":\"" + machineId + "\"}";
 
         juce::URL url (kValidateUrl);
-        auto stream = url.withPOSTData (jsonBody)
-                         .createInputStream (juce::URL::InputStreamOptions (juce::URL::ParameterHandling::inAddress)
-                                                .withExtraHeaders ("Content-Type: application/json")
-                                                .withConnectionTimeoutMs (8000));
+        auto options = juce::URL::InputStreamOptions (juce::URL::ParameterHandling::inAddress)
+                           .withExtraHeaders ("Content-Type: application/json\r\nUser-Agent: LiveFlow-Plugin/1.0")
+                           .withConnectionTimeoutMs (15000)
+                           .withNumRedirectsToFollow (3);
+
+        auto stream = url.withPOSTData (jsonBody).createInputStream (options);
+
+        if (stream == nullptr)
+        {
+            // Try fallback URL if primary fails
+            juce::URL fallbackUrl (kValidateUrlFallback);
+            stream = fallbackUrl.withPOSTData (jsonBody).createInputStream (options);
+        }
 
         if (stream == nullptr)
         {
