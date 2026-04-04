@@ -20,8 +20,8 @@ export function Home() {
     }
   };
 
-  const [downloadUrl, setDownloadUrl] = useState("https://download.micro-grav.com/LiveFlow%20Balancer-v1.0.0-rc1-win64.exe");
-  const [downloadVersion, setDownloadVersion] = useState("v1.0.0-rc1");
+  const [downloadUrl, setDownloadUrl] = useState("https://download.micro-grav.com/LiveFlow-Balancer-latest-win64.exe");
+  const [downloadVersion, setDownloadVersion] = useState("Latest");
 
   useEffect(() => {
     fetch('https://download.micro-grav.com/latest.json?' + new Date().getTime())

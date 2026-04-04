@@ -123,6 +123,7 @@ jobs:
             
             # Upload the Executable (Installers)
             aws s3 cp "$EXE_FILE" "s3://${{ secrets.R2_BUCKET_NAME }}/$EXE_NAME" --endpoint-url https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+            aws s3 cp "$EXE_FILE" "s3://${{ secrets.R2_BUCKET_NAME }}/LiveFlow-Balancer-latest-win64.exe" --endpoint-url https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
             
             # Generate and upload latest.json reference
             echo "{\"version\":\"$VERSION\", \"file_url\":\"https://download.micro-grav.com/$EXE_NAME\"}" > latest.json
