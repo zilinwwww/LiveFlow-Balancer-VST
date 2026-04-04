@@ -439,7 +439,9 @@ void LiveFlowAudioProcessorEditor::updateAllTexts()
     
     if (availableUpdateVersion.isNotEmpty())
     {
-        const auto updateText = isChinese ? (ZH("发现新版本 ") + availableUpdateVersion) : (availableUpdateVersion + " Available!");
+        const auto updateText = isChinese 
+            ? (juce::String::fromUTF8("发现新版本 ") + availableUpdateVersion) 
+            : (availableUpdateVersion + " Available!");
         updateLink.setButtonText (updateText);
     }
 
