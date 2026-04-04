@@ -9,6 +9,7 @@ export function Home() {
   const location = useLocation();
   const [claimStatus, setClaimStatus] = useState<'idle' | 'loading' | 'done'>('idle');
   const [isHighlighting, setIsHighlighting] = useState(false);
+  const [downloadingPlugin, setDownloadingPlugin] = useState<string | null>(null);
 
   const reviewsRef = useRef<HTMLDivElement>(null);
   const teamRef = useRef<HTMLDivElement>(null);
@@ -38,10 +39,15 @@ export function Home() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('auto_download') === 'true' && downloadUrl && !downloadUrl.includes('auto_download')) {
+    const autoTarget = params.get('auto_download');
+    // If autoTarget exists (e.g. 'balancer' or 'true'), trigger the overlay
+    if (autoTarget && downloadUrl && !downloadUrl.includes('auto_download')) {
+      const pluginName = autoTarget === 'true' ? 'Balancer' : (autoTarget.charAt(0).toUpperCase() + autoTarget.slice(1));
+      setDownloadingPlugin(pluginName);
       const timer = setTimeout(() => {
         window.location.href = downloadUrl;
-      }, 1000);
+        setTimeout(() => setDownloadingPlugin(null), 2000); // hide overlay shortly after download triggers
+      }, 1500); // 1.5s delay to let user see the nice overlay
       return () => clearTimeout(timer);
     }
   }, [downloadUrl]);
@@ -72,6 +78,30 @@ export function Home() {
 
   return (
     <div className="page home-page">
+      {downloadingPlugin && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(9, 18, 30, 0.4)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999,
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8))',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            padding: '40px 60px', borderRadius: '24px', textAlign: 'center',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            transform: 'scale(1)'
+          }}>
+             <h2 style={{ color: '#fff', fontSize: '28px', margin: '0 0 12px 0', fontWeight: 600, letterSpacing: '0.5px' }}>
+               <span style={{color: '#3ecfd5'}}>⤓</span> {i('home.series') === 'Series' ? 'Preparing Download...' : '正在准备下载...'}
+             </h2>
+             <p style={{ color: '#94a3b8', margin: 0, fontSize: '16px' }}>
+               LiveFlow {downloadingPlugin} {i('home.series') === 'Series' ? 'is starting shortly' : '即将开始下载'}
+             </p>
+          </div>
+        </div>
+      )}
+
       <section className="hero">
         <div className="hero-text">
           <h1><span className="brand-live">Live</span><span className="brand-flow">Flow</span> {i('home.series')}</h1>
