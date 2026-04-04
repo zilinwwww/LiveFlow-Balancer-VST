@@ -281,18 +281,6 @@ export function Dashboard() {
                                 ({lic.machine_id.substring(0, 8)})
                               </span>
                             </span>
-                            {lic.machine_info && (
-                              <div className="tooltip-container" style={{ position: 'relative', display: 'inline-block', cursor: 'help' }}>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--accent)', verticalAlign: 'middle' }}>
-                                  <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                </svg>
-                                <div className="tooltip-content" style={{ display: 'none', position: 'absolute', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', padding: '10px', borderRadius: '8px', zIndex: 10, width: 'max-content', maxWidth: '300px', bottom: '120%', left: '50%', transform: 'translateX(-50%)', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
-                                  <pre style={{ margin: 0, fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                                    {lic.machine_info}
-                                  </pre>
-                                </div>
-                              </div>
-                            )}
                           </div>
                         ) : '—'}
                       </td>
