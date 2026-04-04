@@ -20,6 +20,10 @@ export function Home() {
     }
   };
 
+  const handleDownload = () => {
+    window.location.href = "https://download.micro-grav.com/LiveFlow%20Balancer-v1.0.0-rc1-win64.exe";
+  };
+
   useEffect(() => {
     if (location.state?.highlightClaim) {
       setIsHighlighting(true);
@@ -63,9 +67,9 @@ export function Home() {
                 <li>{i('home.f4')}</li>
               </ul>
               <div className="product-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <a href="https://download.micro-grav.com/LiveFlow%20Balancer-v1.0.0-rc1-win64.exe" target="_blank" rel="noreferrer" className="btn btn-secondary">
+                <button onClick={handleDownload} className="btn btn-secondary">
                   {i('home.downloadWin')}
-                </a>
+                </button>
                 {!user ? (
                   <Link to="/register" className="btn btn-primary">{i('home.regLicense')}</Link>
                 ) : claimStatus === 'done' ? (
