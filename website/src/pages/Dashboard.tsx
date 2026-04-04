@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLang } from '../contexts/LangContext';
 
@@ -9,7 +9,8 @@ interface License {
 }
 
 export function Dashboard() {
-  const { user, loading: authLoading, refresh } = useAuth();
+  const navigate = useNavigate();
+  const { user, loading: authLoading, refresh, logout } = useAuth();
   const { i } = useLang();
   
   const [activeTab, setActiveTab] = useState<'licenses' | 'settings'>('licenses');
@@ -34,6 +35,64 @@ export function Dashboard() {
   const [newPwd, setNewPwd] = useState('');
   const [pwdSaving, setPwdSaving] = useState(false);
   const [pwdMsg, setPwdMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteCode, setDeleteCode] = useState('');
+  const [deleteCodeStatus, setDeleteCodeStatus] = useState<'idle' | 'sending' | 'cooldown'>('idle');
+  const [deleteCountdown, setDeleteCountdown] = useState(60);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteMsg, setDeleteMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+
+  const handleSendDeleteCode = async () => {
+    if (!user?.email) return;
+    setDeleteMsg(null); setDeleteCodeStatus('sending');
+    try {
+      const res = await fetch('/api/auth/send-code', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email, intent: 'delete' }),
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        if (data.mocked) setDeleteMsg({ type: 'ok', text: `[Local] Code in console` });
+        else setDeleteMsg({ type: 'ok', text: i('reg.codeSent') });
+        setDeleteCodeStatus('cooldown'); setDeleteCountdown(60);
+        const timer = setInterval(() => {
+          setDeleteCountdown(c => {
+            if (c <= 1) { clearInterval(timer); setDeleteCodeStatus('idle'); return 60; }
+            return c - 1;
+          });
+        }, 1000);
+      } else {
+        setDeleteMsg({ type: 'err', text: data.message || "Failed" });
+        setDeleteCodeStatus('idle');
+      }
+    } catch {
+      setDeleteMsg({ type: 'err', text: i('reg.networkErr') });
+      setDeleteCodeStatus('idle');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteCode.length !== 6) return;
+    setDeleting(true); setDeleteMsg(null);
+    try {
+      const res = await fetch('/api/auth/delete-account', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: deleteCode }), credentials: 'same-origin'
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        logout();
+        navigate('/');
+      } else {
+        setDeleteMsg({ type: 'err', text: data.code === 'CODE_INVALID' ? i('reg.invalidCode') : data.message || "Deletion failed" });
+      }
+    } catch {
+      setDeleteMsg({ type: 'err', text: i('reg.networkErr') });
+    }
+    setDeleting(false);
+  };
+
 
   useEffect(() => {
     if (user && user.name) setName(user.name);
@@ -272,6 +331,55 @@ export function Dashboard() {
                   {pwdSaving ? i('dash.updating') : i('dash.updatePwd')}
                 </button>
               </form>
+            </div>
+
+            <hr className="settings-divider" />
+
+            <div className="settings-section">
+              <h3 style={{ color: 'var(--error)' }}>{i('dash.dangerZone')}</h3>
+              <p className="text-muted" style={{ marginBottom: '20px' }}>{i('dash.deleteWarn')}</p>
+              
+              {!showDeleteConfirm ? (
+                <button className="btn btn-primary" style={{ background: 'rgba(255, 107, 107, 0.1)', color: 'var(--error)', border: '1px solid var(--error)' }} onClick={() => setShowDeleteConfirm(true)}>
+                  {i('dash.deleteBtn')}
+                </button>
+              ) : (
+                <div style={{ background: 'rgba(255, 107, 107, 0.05)', padding: '24px', borderRadius: 'var(--radius)', border: '1px solid rgba(255, 107, 107, 0.3)' }}>
+                  {deleteMsg && <div className={`alert alert-${deleteMsg.type === 'ok' ? 'success' : 'error'}`}>{deleteMsg.text}</div>}
+                  <p style={{ marginBottom: '15px' }}>{i('dash.deleteCode')}</p>
+                  
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', maxWidth: '400px' }}>
+                    <input type="email" value={user.email} disabled className="settings-form" style={{ padding: '10px', background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', color: 'var(--text-muted)', flex: 1, cursor: 'not-allowed' }} />
+                    <button 
+                      type="button" 
+                      className="btn" 
+                      onClick={handleSendDeleteCode} 
+                      disabled={deleteCodeStatus !== 'idle'} 
+                      style={{ whiteSpace: 'nowrap', padding: '0 16px', background: 'transparent', border: '1px solid var(--error)', color: 'var(--error)' }}
+                    >
+                      {deleteCodeStatus === 'sending' ? i('reg.sending') : deleteCodeStatus === 'cooldown' ? i('reg.resendIn').replace('{s}', deleteCountdown.toString()) : i('reg.sendCode')}
+                    </button>
+                  </div>
+                  
+                  <input 
+                    type="text" 
+                    placeholder={i('reg.code')} 
+                    value={deleteCode} 
+                    onChange={e => setDeleteCode(e.target.value.toUpperCase())} 
+                    style={{ letterSpacing: '2px', fontFamily: 'monospace', width: '100%', maxWidth: '400px', marginBottom: '20px', padding: '12px', background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', color: 'var(--text-main)' }} 
+                    maxLength={6}
+                  />
+                  
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button className="btn" onClick={() => { setShowDeleteConfirm(false); setDeleteCode(''); setDeleteMsg(null); }} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                      取消 (Cancel)
+                    </button>
+                    <button className="btn btn-primary" style={{ background: 'var(--error)', color: '#fff', border: 'none' }} onClick={handleDeleteAccount} disabled={deleting || deleteCode.length !== 6}>
+                      {deleting ? i('dash.deleting') : i('dash.deleteConfirm')}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>

@@ -1,16 +1,22 @@
 import { json, type Env } from '../_utils';
 
-interface RequestBody { email: string; }
+interface RequestBody { email: string; intent?: 'register' | 'delete'; }
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
-    const { email } = await context.request.json<RequestBody>();
+    const { email, intent = 'register' } = await context.request.json<RequestBody>();
     if (!email) return json({ status: 'error', code: 'MISSING_FIELDS' }, 400);
     const targetEmail = email.toLowerCase();
 
-    // 1. Check if email already registered
     const existing = await context.env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(targetEmail).first();
-    if (existing) return json({ status: 'error', code: 'EMAIL_EXISTS' }, 409);
+    
+    if (intent === 'register' && existing) {
+      return json({ status: 'error', code: 'EMAIL_EXISTS' }, 409);
+    }
+    
+    if (intent === 'delete' && !existing) {
+      return json({ status: 'error', code: 'USER_NOT_FOUND' }, 404);
+    }
 
     // 2. Generate safe 6-digit alphanum code
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();

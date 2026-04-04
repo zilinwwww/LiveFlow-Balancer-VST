@@ -116,6 +116,15 @@ const t: Record<string, Record<Lang, string>> = {
   'dash.updating':    { en: 'Updating...',      zh: '更新中...' },
   'dash.pwdOk':       { en: 'Password updated!', zh: '密码更新成功！' },
   'dash.pwdErr':      { en: 'Incorrect old password or invalid input', zh: '原密码错误或输入不合法' },
+  
+  // Danger Zone
+  'dash.dangerZone':  { en: 'Danger Zone',      zh: '危险区域' },
+  'dash.deleteTitle': { en: 'Delete Account',   zh: '注销账号' },
+  'dash.deleteWarn':  { en: 'Permanently delete your account and revoke all associated licenses. This action cannot be undone.', zh: '永久注销您的账号并吊销所有绑定的许可证。此操作不可逆！' },
+  'dash.deleteBtn':   { en: 'Delete Account...', zh: '申请注销账号...' },
+  'dash.deleteConfirm': { en: 'Confirm Deletion', zh: '确认注销' },
+  'dash.deleteCode':  { en: 'Enter verification code sent to your email to confirm deletion:', zh: '请输入验证码以确认注销（验证码已发送至您的邮箱）：' },
+  'dash.deleting':    { en: 'Deleting...',      zh: '注销中...' },
 
   // Footer
   'footer.rights':    { en: 'All rights reserved.', zh: '保留所有权利。' },
