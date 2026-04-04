@@ -26,14 +26,25 @@ export function Home() {
   useEffect(() => {
     fetch('https://download.micro-grav.com/latest.json?' + new Date().getTime())
       .then(res => res.json())
-      .then((data: { version: string; file_url: string }) => {
+      .then((data: { version: string; file_url: string; exe_url?: string }) => {
         if (data.version && data.file_url) {
           setDownloadVersion(data.version);
-          setDownloadUrl(data.file_url);
+          // Prefer exe_url if available, fallback to file_url
+          setDownloadUrl(data.exe_url || data.file_url);
         }
       })
       .catch(e => console.warn('Could not fetch latest release:', e));
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('auto_download') === 'true' && downloadUrl && !downloadUrl.includes('auto_download')) {
+      const timer = setTimeout(() => {
+        window.location.href = downloadUrl;
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [downloadUrl]);
 
   const handleDownload = () => {
     window.location.href = downloadUrl;
