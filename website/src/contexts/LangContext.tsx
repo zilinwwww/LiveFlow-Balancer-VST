@@ -24,6 +24,7 @@ const t: Record<string, Record<Lang, string>> = {
   'home.regLicense':  { en: 'Register & Get Free License', zh: '注册并获取免费许可证' },
   'home.claiming':    { en: 'Claiming...', zh: '领取中...' },
   'home.claimed':     { en: '✅ License Claimed! Check Dashboard', zh: '✅ 已领取！请查看面板' },
+  'home.downloadWin': { en: 'Download for Windows', zh: '下载 Windows 端' },
   'home.more':        { en: 'More plugins coming soon.', zh: '更多插件即将推出。' },
   
   // Testimonials

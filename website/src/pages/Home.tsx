@@ -62,7 +62,10 @@ export function Home() {
                 <li>{i('home.f3')}</li>
                 <li>{i('home.f4')}</li>
               </ul>
-              <div className="product-actions">
+              <div className="product-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <a href="#" target="_blank" rel="noreferrer" className="btn btn-secondary">
+                  {i('home.downloadWin')}
+                </a>
                 {!user ? (
                   <Link to="/register" className="btn btn-primary">{i('home.regLicense')}</Link>
                 ) : claimStatus === 'done' ? (
