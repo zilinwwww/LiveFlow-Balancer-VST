@@ -17,6 +17,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     // status === 'bound'
     if (license.machine_id === machineId) {
+      // Record validation hit in background without blocking response
+      await context.env.DB.prepare(
+        "UPDATE licenses SET validation_count = COALESCE(validation_count, 0) + 1, last_validated_at = datetime('now') WHERE id = ?"
+      ).bind(license.id).run();
+
       return json({ status: 'ok', valid: true });
     }
     return json({ status: 'ok', valid: false, reason: 'REBOUND' });
