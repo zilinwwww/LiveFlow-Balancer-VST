@@ -137,6 +137,11 @@ LiveFlowAudioProcessorEditor::LiveFlowAudioProcessorEditor (LiveFlowAudioProcess
     websiteLink.setColour (juce::HyperlinkButton::textColourId, coreAccent (4).withAlpha (0.7f));
     websiteLink.setFont (juce::FontOptions(13.0f, juce::Font::bold), false, juce::Justification::centred);
 
+    addChildComponent (updateLink);
+    updateLink.setColour (juce::HyperlinkButton::textColourId, juce::Colour (0xffffb84d));
+    updateLink.setFont (juce::FontOptions(12.0f, juce::Font::bold), false, juce::Justification::centredLeft);
+    updateLink.setVisible (false);
+
     addAndMakeVisible (langButton);
     langButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0x10ffffff));
     langButton.setColour (juce::TextButton::textColourOffId, juce::Colour (0xffeef4fb));
@@ -226,6 +231,41 @@ void LiveFlowAudioProcessorEditor::timerCallback()
         });
     }
 
+    if (! updateCheckTriggered)
+    {
+        updateCheckTriggered = true;
+        auto safeThis = juce::Component::SafePointer<LiveFlowAudioProcessorEditor> (this);
+        juce::Thread::launch ([safeThis]
+        {
+            juce::URL url ("https://download.micro-grav.com/latest.json?" + juce::String(juce::Time::getCurrentTime().toMilliseconds()));
+            juce::String jsonResult = url.readEntireTextStream();
+            
+            if (jsonResult.isNotEmpty())
+            {
+                juce::var parsed = juce::JSON::parse (jsonResult);
+                if (auto* obj = parsed.getDynamicObject())
+                {
+                    juce::String newestVer = obj->getProperty ("version").toString();
+                    juce::String linkUrl = obj->getProperty ("file_url").toString();
+                    
+                    if (newestVer.isNotEmpty() && newestVer != juce::String(LIVEFLOW_VERSION_EXT))
+                    {
+                        juce::MessageManager::callAsync ([safeThis, newestVer, linkUrl]
+                        {
+                            if (safeThis != nullptr)
+                            {
+                                safeThis->updateLink.setButtonText (newestVer + " Available!");
+                                safeThis->updateLink.setURL (juce::URL (linkUrl));
+                                safeThis->updateLink.setVisible (true);
+                                safeThis->resized();
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
     const auto snap = processor.getVisualizationState().capture();
     gainTimeline.updateFromSnapshot (snap);
     presenceIndicator.setPresence (snap.voicePresence);
@@ -283,8 +323,17 @@ void LiveFlowAudioProcessorEditor::resized()
     auto langArea = titleArea.removeFromRight (40).reduced (0, 4);
     langButton.setBounds (langArea);
     
-    // Website link centered in remaining title area
-    websiteLink.setBounds (titleArea);
+    // Website link centered tightly
+    const int webW = 60;
+    const int upW = updateLink.isVisible() ? 100 : 0;
+    auto centerArea = titleArea.withSizeKeepingCentre (webW + 8 + upW, titleArea.getHeight());
+    
+    websiteLink.setBounds (centerArea.removeFromLeft (webW));
+    if (updateLink.isVisible())
+    {
+        centerArea.removeFromLeft (8);
+        updateLink.setBounds (centerArea);
+    }
 
     // Calculate fixed height needed below the canvas (Removed expertButton bottom row)
     int fixedBottomHeight = 6 + 52 + 6 + 72; // Margins + middleStrip + coreKnobs

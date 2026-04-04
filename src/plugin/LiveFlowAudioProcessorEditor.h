@@ -81,6 +81,9 @@ private:
 
     // Header buttons
     juce::HyperlinkButton websiteLink;
+    juce::HyperlinkButton updateLink;
+    bool updateCheckTriggered = false;
+
     juce::TextButton expertButton;
     juce::TextButton helpButton;
     juce::TextButton aboutButton;
